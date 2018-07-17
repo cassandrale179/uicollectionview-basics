@@ -15,7 +15,10 @@
 		601833DE20FD717A00F94150 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 601833DD20FD717A00F94150 /* main.m */; };
 		601833E820FD717A00F94150 /* EMPGTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 601833E720FD717A00F94150 /* EMPGTests.m */; };
 		601833F320FD717A00F94150 /* EMPGUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 601833F220FD717A00F94150 /* EMPGUITests.m */; };
-		6018340C20FE8AC900F94150 /* EPGRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6018340B20FE8AC800F94150 /* EPGRenderer.m */; };
+		6018340C20FE8AC900F94150 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		606F00E220FEAF9F00DCD67E /* EPGCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00DC20FEAF9F00DCD67E /* EPGCollectionViewCell.m */; };
+		606F00E320FEAF9F00DCD67E /* EPGCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */; };
+		606F00E420FEAF9F00DCD67E /* DataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00E120FEAF9F00DCD67E /* DataModel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,8 +55,12 @@
 		601833EE20FD717A00F94150 /* EMPGUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = EMPGUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		601833F220FD717A00F94150 /* EMPGUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EMPGUITests.m; sourceTree = "<group>"; };
 		601833F420FD717A00F94150 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6018340A20FE8ABA00F94150 /* EPGRenderer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EPGRenderer.h; path = /google/src/cloud/cassandrale/myworkspace/google3/experimental/users/cassandrale/EMPG/EMPG/EPGRenderer.h; sourceTree = "<absolute>"; };
-		6018340B20FE8AC800F94150 /* EPGRenderer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = EPGRenderer.m; path = /google/src/cloud/cassandrale/myworkspace/google3/experimental/users/cassandrale/EMPG/EMPG/EPGRenderer.m; sourceTree = "<absolute>"; };
+		606F00DC20FEAF9F00DCD67E /* EPGCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EPGCollectionViewCell.m; sourceTree = "<group>"; };
+		606F00DD20FEAF9F00DCD67E /* DataModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataModel.h; sourceTree = "<group>"; };
+		606F00DE20FEAF9F00DCD67E /* EPGCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EPGCollectionViewCell.h; sourceTree = "<group>"; };
+		606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EPGCollectionViewLayout.m; sourceTree = "<group>"; };
+		606F00E020FEAF9F00DCD67E /* EPGCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EPGCollectionViewLayout.h; sourceTree = "<group>"; };
+		606F00E120FEAF9F00DCD67E /* DataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataModel.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,8 +111,12 @@
 		601833CD20FD717800F94150 /* EMPG */ = {
 			isa = PBXGroup;
 			children = (
-				6018340A20FE8ABA00F94150 /* EPGRenderer.h */,
-				6018340B20FE8AC800F94150 /* EPGRenderer.m */,
+				606F00DD20FEAF9F00DCD67E /* DataModel.h */,
+				606F00E120FEAF9F00DCD67E /* DataModel.m */,
+				606F00DE20FEAF9F00DCD67E /* EPGCollectionViewCell.h */,
+				606F00DC20FEAF9F00DCD67E /* EPGCollectionViewCell.m */,
+				606F00E020FEAF9F00DCD67E /* EPGCollectionViewLayout.h */,
+				606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */,
 				601833CE20FD717800F94150 /* AppDelegate.h */,
 				601833CF20FD717800F94150 /* AppDelegate.m */,
 				601833D120FD717800F94150 /* ViewController.h */,
@@ -268,9 +279,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				601833D320FD717900F94150 /* ViewController.m in Sources */,
+				606F00E320FEAF9F00DCD67E /* EPGCollectionViewLayout.m in Sources */,
 				601833DE20FD717A00F94150 /* main.m in Sources */,
+				606F00E220FEAF9F00DCD67E /* EPGCollectionViewCell.m in Sources */,
+				606F00E420FEAF9F00DCD67E /* DataModel.m in Sources */,
 				601833D020FD717800F94150 /* AppDelegate.m in Sources */,
-				6018340C20FE8AC900F94150 /* EPGRenderer.m in Sources */,
+				6018340C20FE8AC900F94150 /* (null) in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
