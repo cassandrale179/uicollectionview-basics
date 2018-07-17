@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:EMPG.xcodeproj">
+      location = "group:/google/src/cloud/cassandrale/myworkspace/google3/experimental/users/cassandrale/EMPG/EMPG/EPGRenderer.m">
+   </FileRef>
+   <FileRef
+      location = "group:/google/src/cloud/cassandrale/myworkspace/google3/experimental/users/cassandrale/EMPG/EMPG/EPGRenderer.h">
+   </FileRef>
+   <FileRef
+      location = "self:">
    </FileRef>
 </Workspace>
