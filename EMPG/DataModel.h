@@ -1,7 +1,5 @@
 #import <Foundation/Foundation.h>
-//#import <UIKit/UIKit.h>
 
-// For each aring, has a movie title, start time, end time and image
 @interface AiringRenderer : NSObject
   @property (nonatomic, readwrite) NSString* airingTitle;;
   @property (nonatomic, readwrite) long airingStartTime;
@@ -12,8 +10,9 @@
 // For each station, create a list of airings
 @interface StationRenderer : NSObject
   @property (nonatomic, readwrite) NSMutableArray <AiringRenderer*> *airings;
-  @property (nonatomic, readwrite) NSString* networkName;
+  @property (nonatomic, readwrite) NSString* stationName;
 //  @property (nonatomic, readwrite) UIImage* networkLogo;
+
 @end
 
 
@@ -23,5 +22,3 @@
   @property (nonatomic, readwrite) long startTime;
   @property (nonatomic, readwrite) long endTime;
 @end
-
-
