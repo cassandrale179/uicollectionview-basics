@@ -18,7 +18,7 @@
   //self.backgroundColor = [UIColor blueColor];
   self.layer.borderWidth = 2.0f;
   self.layer.borderColor = [UIColor blackColor].CGColor;
-  NSLog(@"This is the new x: %f", self.frame.origin.x);
+  // NSLog(@"This is the new x: %f", self.frame.origin.x);
   [self.title setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y,70,30)];
   self.title.text = @"title";
   [self.contentView addSubview:self.title];

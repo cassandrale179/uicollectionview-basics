@@ -14,6 +14,7 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+  
   // Do any additional setup after loading the view, typically from a nib.
   UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
   self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -27,10 +28,14 @@
   [self.view addSubview:collectionView];
 }
 
+
+// Return how many rows within UI Collection View
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
   return 5;
 }
 
+
+// Return how many collumns within UI Collection View
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
   return fakeTitles.count;
 }
@@ -45,19 +50,22 @@
   //[cell.layer]
 //  [cell.title setFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y,70,30)];
 //  [cell.contentView addSubview:cell.title];
-  NSLog(@"this is the title %f", cell.frame.origin.x);
-  NSLog(@"this is the title %f", cell.frame.origin.x);
-  
-  
+//  NSLog(@"this is the title %f", cell.frame.origin.x);
+//  NSLog(@"this is the title %f", cell.frame.origin.x);
+//
   return cell;
 }
 
+
+// Specify the width and height of the cell
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
   return CGSizeMake(100, 50);
 }
 
+
+// Specifying spacing between the cell 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
-  return UIEdgeInsetsMake(30, 0, 20, 0);
+  return UIEdgeInsetsMake(50, 0, 20, 0);
 }
 
 - (void)didReceiveMemoryWarning {
