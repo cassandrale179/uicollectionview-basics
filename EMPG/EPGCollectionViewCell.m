@@ -7,9 +7,17 @@
 {
   self = [super initWithFrame:frame];
   if (self) {
-    self.thumbnailView = [[UIImageView alloc] init];
+    self.title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
+    self.title.textColor = [UIColor blackColor];
+    self.title.textAlignment = NSTextAlignmentCenter;
+    self.descriptionText = [[UILabel alloc]initWithFrame:CGRectMake(0, 30, 200, 30)];
+    self.descriptionText.textColor = [UIColor blackColor];
+    self.descriptionText.textAlignment = NSTextAlignmentCenter;
+    self.thumbnailView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     [self.contentView addSubview:self.title];
-    self.layer.borderColor = (__bridge CGColorRef _Nullable)([UIColor blackColor]);
+    [self.contentView addSubview:self.thumbnailView];
+    [self.contentView addSubview:self.descriptionText];
+    //self.layer.borderColor = (__bridge CGColorRef _Nullable)([UIColor blackColor]);
   }
   return self;
 }
@@ -18,14 +26,13 @@
   //self.backgroundColor = [UIColor blueColor];
   self.layer.borderWidth = 2.0f;
   self.layer.borderColor = [UIColor blackColor].CGColor;
-  // NSLog(@"This is the new x: %f", self.frame.origin.x);
-  [self.title setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y,70,30)];
-  self.title.text = @"title";
-  [self.contentView addSubview:self.title];
-  
+  //self.descriptionText = descriptionText;
+  NSLog(@"This is the new x: %f with title: %@", self.title.frame.origin.x, self.title.text);
+  //[self.contentView addSubview:self.title];
+
  // [self.title setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y,70,30)];
-  
-  
+
+
   // self.description.text = descriptionText;
 }
 -(void) setThumbnailView:(UIImageView *)thumbnailView{
