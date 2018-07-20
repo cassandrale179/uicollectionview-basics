@@ -10,17 +10,22 @@ CGFloat borderPadding = 30;
 CGFloat timeInterval = 30;
 CGFloat currentTime = 15;
 CGFloat endTime = 25;
-CGFloat firstTime = 0;//first time showing on the screen
+CGFloat firstTime = 0;                                          //first time showing on the screen
 EPGRenderer *epg;
 CGFloat yPadding = 50;
 Boolean needSetup = true;
 
-// Constants for the hour header
-static const NSUInteger Hours = 3;                          // display show within next 7 hours
-static const CGFloat HourHeaderHeight = 40;                 // height of the header
-static const CGFloat ChannelHeaderWidth = 100;
-static const CGFloat ThumbnailSize = 0.5;
+// Constants
+static const NSUInteger HalfHours = 3;                          // display show within next 3 half-hour
+static const NSUInteger StationsPerColumn = 10;                 // list of stations to display
+static const CGFloat HourHeaderHeight = 40;                     // height of each time cell
+static const CGFloat ChannelHeaderHeight = 100;                 // height of each channel cell
+static const CGFloat ChannelHeaderWidth = 100;                  // width of each channel cell
+static const CGFloat ThumbnailSize = 0.5;                       // size of the video thumbnail
 
+
+
+// Return content size here
 - (CGSize)collectionViewContentSize{
   return contentSize;
 }
@@ -31,7 +36,6 @@ static const CGFloat ThumbnailSize = 0.5;
   // Calculating the bounds (origin x and y) of the cells
   if(needSetup){
     [self createEPG];
-    NSLog(@"This is the new epg !%@", epg);
     needSetup = false;
   }
 
@@ -41,7 +45,7 @@ static const CGFloat ThumbnailSize = 0.5;
 
     for(int section = 0; section<self.collectionView.numberOfSections; section++){
       if([self.collectionView numberOfItemsInSection:section] > 0){
-        CGFloat xPos = 0;
+        CGFloat xPos = ChannelHeaderWidth;
         CGFloat yPos = yPadding+section*CELL_HEIGHT+borderPadding*section;
 
         // Calculate the frame of each airing
@@ -76,10 +80,12 @@ static const CGFloat ThumbnailSize = 0.5;
   }
 }
 
+
+# pragma mark ------ LAYOUT ATTRRIBUTE FOR ELEMENT IN RECT AND SUPPLEMENTARY VIEW --------
 // Return the frame for each cell (333.333 0; 200 100)
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect{
 
-    NSMutableArray *attributesInRect = [[NSMutableArray alloc] init];
+  NSMutableArray *attributesInRect = [[NSMutableArray alloc] init];
 
   // Array for normal airing cells
   for(NSIndexPath *indexPath in cellAttrDict){
@@ -92,37 +98,57 @@ static const CGFloat ThumbnailSize = 0.5;
 
   // Supplementary view for the header of the hours (9:00 PM - 10:00 PM)
   NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViewsInRect:rect];
+  NSLog(@"array count for hour %ld", [hourHeaderViewIndexPaths count]);
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
     if(CGRectIntersectsRect(rect, attributes.frame)){
       [attributesInRect addObject:attributes];
-
     }
   }
+
+
+  // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
+  NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViewsInRect:rect];
+  NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
+  for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
+    UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
+    NSLog(@"attribute in channel header %@", attributes);
+    [attributesInRect addObject:attributes];
+  }
+
+//  NSLog(@"attribute in rect %@", attributesInRect);
   return attributesInRect;
 }
 
-# pragma mark ------ SUPPLEMENTARY VIEW METHODS FOR HOURS --------
+
+// Layout Attribute for Supplementary View (the time header and the channel header)
 - (UICollectionViewLayoutAttributes *) layoutAttributesForSupplementaryViewOfKind:(NSString *)kind
                                                                       atIndexPath:(NSIndexPath *)indexPath{
   UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
-   CGFloat totalWidth = [self collectionViewContentSize].width;
+  CGFloat totalWidth = [self collectionViewContentSize].width;
 
   // If it's the hour header view, draw the frame for it
   if ([kind isEqualToString:@"HourHeaderView"]) {
     CGFloat availableWidth = totalWidth - ChannelHeaderWidth;
-    CGFloat widthPerHalfHour = availableWidth / Hours;
+    CGFloat widthPerHalfHour = availableWidth / HalfHours;
     attributes.frame = CGRectMake(ChannelHeaderWidth + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, HourHeaderHeight);
-    // attributes.zIndex = -10;
+    attributes.zIndex = -10;
+  }
+
+  // If it's the station header view, draw the frame for it
+  else if ([kind isEqualToString:@"ChannelHeaderView"]) {
+    attributes.frame = CGRectMake(0, HourHeaderHeight + ChannelHeaderHeight * indexPath.item, ChannelHeaderWidth, ChannelHeaderHeight);
+//    attributes.zIndex = -10;
   }
   return attributes;
 }
 
+# pragma mark ------ SUPPLEMENTARY VIEW METHODS FOR HOURS --------
 // Calculate the x coordinate of the hour
 - (NSInteger)hourIndexFromXCoordinate:(CGFloat)xPosition
 {
   CGFloat contentWidth = [self collectionViewContentSize].width - ChannelHeaderWidth;          // width of the entire UICollectionView
-  CGFloat widthPerHalfHour = contentWidth / Hours;                                             // width for each hour cell = content / 3
+  CGFloat widthPerHalfHour = contentWidth / HalfHours;                                         // width for each hour cell = content / 3
   NSInteger hourIndex = MAX((NSInteger)0, (NSInteger)((xPosition - ChannelHeaderWidth) / widthPerHalfHour));
   return hourIndex;
 }
@@ -144,6 +170,32 @@ static const CGFloat ThumbnailSize = 0.5;
   return indexPaths;
 }
 
+# pragma mark ------ SUPPLEMENTARY VIEW METHODS FOR CHANNELS --------
+// Calculate the Y Coordinate of each channel
+- (NSInteger) channelIndexFromYCoordinate:(CGFloat)yPosition{
+  NSInteger stationIndex = MAX((NSInteger)0, (NSInteger)(yPosition - HourHeaderHeight) / ChannelHeaderHeight);
+  NSLog(@"stationindex %ld", stationIndex);
+  return stationIndex;
+}
+
+
+// Return index path for the stations
+- (NSArray *)indexPathsOfChannelHeaderViewsInRect:(CGRect)rect
+{
+  if (CGRectGetMinX(rect) > ChannelHeaderWidth) {
+    return [NSArray array];
+  }
+
+  NSInteger minChannelIndex = [self channelIndexFromYCoordinate:CGRectGetMinY(rect)];
+  NSInteger maxChannelIndex = [self channelIndexFromYCoordinate:CGRectGetMaxY(rect)];
+
+  NSMutableArray *indexPaths = [NSMutableArray array];
+  for (NSInteger idx = minChannelIndex; idx <= maxChannelIndex; idx++) {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:idx inSection:0];
+    [indexPaths addObject:indexPath];
+  }
+  return indexPaths;
+}
 
 # pragma mark ----- HELPER METHODS ------
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath{
