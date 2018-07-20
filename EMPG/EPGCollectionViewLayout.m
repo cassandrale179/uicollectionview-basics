@@ -66,7 +66,6 @@ Boolean needSetup = true;
       contentSize = CGSizeMake(contentWidth, contentHeight);
       
     }
-    //NSLog(@"This is the new contentSize %@", NSStringFromCGSize(contentSize));
   }
 }
 
@@ -93,7 +92,6 @@ Boolean needSetup = true;
 }
 
 - (void) createEPG{
-  NSLog(@"createEPG");
   // Timestamp generator;
   int timestamp = [[NSDate date] timeIntervalSince1970];
   int from = 900;
@@ -137,10 +135,6 @@ Boolean needSetup = true;
       NSLocale* currentLocale = [NSLocale currentLocale];
       airing.airingStartTime = [NSDate date];
       airing.airingEndTime = [NSDate dateWithTimeInterval:(arc4random() % (to-from+1)) sinceDate:airing.airingStartTime];
-      //NSLog(@"This is the end time at the beginning %f", [airing.airingEndTime timeIntervalSince1970]);
-      //NSLog(@"This is the current %@", airing.airingEndTime);
-      //airing.airingEndTime =  timestamp + (int)from + arc4random() % (to-from+1);
-      //53108074
       
       [station.airings addObject:airing];
     }
