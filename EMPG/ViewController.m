@@ -1,5 +1,6 @@
 #import "ViewController.h"
 #import "EPGCollectionViewCell.h"
+#import "TimeCell.h"
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
 
@@ -10,6 +11,7 @@
   UICollectionViewFlowLayout *flowLayout;
   NSArray *fakeDescrip;
   EPGRenderer *epg;
+  NSString *timeCellIdentifier;
 }
 
 - (void) createEPG;
@@ -21,11 +23,11 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  // Register class method
-  [collectionView registerClass:[UICollectionReusableView class]
-          forSupplementaryViewOfKind: UICollectionElementKindSectionHeader
-                 withReuseIdentifier:@"HeaderView"];
 
+  // Register class method
+
+  NSString *const HourHeaderView = @"HourHeaderView";
+  timeCellIdentifier = NSStringFromClass([TimeCell class]);
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -36,12 +38,15 @@
 
   fakeDescrip = @[@"D1", @"D2", @"D3", @"D4"];
 
-
   // Set Data Source and Delegate and Cell ID
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
   [collectionView setDataSource:self];
   [collectionView setDelegate: self];
   [collectionView registerClass:[EPGCollectionViewCell class] forCellWithReuseIdentifier:@"epgCell"];
+  [collectionView registerClass:[TimeCell class]
+     forSupplementaryViewOfKind: HourHeaderView
+            withReuseIdentifier: timeCellIdentifier];
+  //[collectionView registerNib:[TimeCell class] forSupplementaryViewOfKind:HourHeaderView withReuseIdentifier:timeCellIdentifier];
   [collectionView setBackgroundColor:[UIColor whiteColor]];
   collectionView.directionalLockEnabled = true;
   [self.view addSubview:collectionView];
@@ -53,15 +58,6 @@
                   layout:(UICollectionViewLayout *)collectionViewLayout
 referenceSizeForHeaderInSection:(NSInteger)section {
   return CGSizeMake(60.0f, 60.0f);
-}
-
-// Link the header of collection view to the header we created (through the identifier)
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
-           viewForSupplementaryElementOfKind:(NSString *)kind
-                                 atIndexPath:(NSIndexPath *)indexPath{
-  UICollectionReusableView* view = [collectionView dequeueReusableSupplementaryViewOfKind: kind withReuseIdentifier:@"HeaderView" forIndexPath:indexPath];
-  NSLog(@"this header method is called!!!!");
-  return view;
 }
 
 
@@ -90,12 +86,18 @@ referenceSizeForHeaderInSection:(NSInteger)section {
   cell.title.text =  airing.airingTitle;
   cell.descriptionText.text = @"hi";
 
+
   // Set up the cell
   // [cell setup:station[indexPath.item] withDescription:fakeDescrip[indexPath.item]];
 
   return cell;
 }
 
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
+  TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: @"HourHeaderView" withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
+  //timeCell.title.text = @"here2";
+  return timeCell;
+}
 
 // Set the size of the cell
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
