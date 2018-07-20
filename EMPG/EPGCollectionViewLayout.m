@@ -17,9 +17,9 @@ Boolean needSetup = true;
 
 // Constants
 static const NSUInteger HalfHours = 3;                          // display show within next 3 half-hour
-static const NSUInteger StationsInColumn = 10;                  // list of stations to display
+static const NSUInteger StationsPerColumn = 10;                 // list of stations to display
 static const CGFloat HourHeaderHeight = 40;                     // height of each time cell
-static const CGFloat ChannelHeaderHeight = 50;                  // height of each channel cell
+static const CGFloat ChannelHeaderHeight = 100;                 // height of each channel cell
 static const CGFloat ChannelHeaderWidth = 100;                  // width of each channel cell
 static const CGFloat ThumbnailSize = 0.5;                       // size of the video thumbnail
 
@@ -45,7 +45,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
     for(int section = 0; section<self.collectionView.numberOfSections; section++){
       if([self.collectionView numberOfItemsInSection:section] > 0){
-        CGFloat xPos = 0;
+        CGFloat xPos = ChannelHeaderWidth;
         CGFloat yPos = yPadding+section*CELL_HEIGHT+borderPadding*section;
 
         // Calculate the frame of each airing
@@ -80,6 +80,8 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   }
 }
 
+
+# pragma mark ------ LAYOUT ATTRRIBUTE FOR ELEMENT IN RECT AND SUPPLEMENTARY VIEW --------
 // Return the frame for each cell (333.333 0; 200 100)
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect{
 
@@ -96,6 +98,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
   // Supplementary view for the header of the hours (9:00 PM - 10:00 PM)
   NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViewsInRect:rect];
+  NSLog(@"array count for hour %ld", [hourHeaderViewIndexPaths count]);
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
     if(CGRectIntersectsRect(rect, attributes.frame)){
@@ -105,15 +108,20 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
 
   // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
-  NSArray *stationHeaderIndexPaths = [self indexPathsOfStationHeaderViewsInRect:rect];
-  for (NSIndexPath *indexPath in stationHeaderIndexPaths) {
-    UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"StationHeaderView" atIndexPath:indexPath];
+  NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViewsInRect:rect];
+  NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
+  for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
+    UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
+    NSLog(@"attribute in channel header %@", attributes);
     [attributesInRect addObject:attributes];
   }
+
+//  NSLog(@"attribute in rect %@", attributesInRect);
   return attributesInRect;
 }
 
-# pragma mark ------ SUPPLEMENTARY VIEW METHODS FOR HOURS --------
+
+// Layout Attribute for Supplementary View (the time header and the channel header)
 - (UICollectionViewLayoutAttributes *) layoutAttributesForSupplementaryViewOfKind:(NSString *)kind
                                                                       atIndexPath:(NSIndexPath *)indexPath{
   UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
@@ -128,20 +136,20 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   }
 
   // If it's the station header view, draw the frame for it
-  else if ([kind isEqualToString:@"StationHeaderView"]) {
-    attributes.frame = CGRectMake(0, HourHeaderHeight + ChannelHeaderHeight * indexPath.item, totalWidth, ChannelHeaderHeight);
-    attributes.zIndex = -10;
+  else if ([kind isEqualToString:@"ChannelHeaderView"]) {
+    attributes.frame = CGRectMake(0, HourHeaderHeight + ChannelHeaderHeight * indexPath.item, ChannelHeaderWidth, ChannelHeaderHeight);
+//    attributes.zIndex = -10;
   }
   return attributes;
 }
 
+# pragma mark ------ SUPPLEMENTARY VIEW METHODS FOR HOURS --------
 // Calculate the x coordinate of the hour
 - (NSInteger)hourIndexFromXCoordinate:(CGFloat)xPosition
 {
   CGFloat contentWidth = [self collectionViewContentSize].width - ChannelHeaderWidth;          // width of the entire UICollectionView
   CGFloat widthPerHalfHour = contentWidth / HalfHours;                                         // width for each hour cell = content / 3
   NSInteger hourIndex = MAX((NSInteger)0, (NSInteger)((xPosition - ChannelHeaderWidth) / widthPerHalfHour));
-  NSLog(@"hour index %ld", hourIndex);
   return hourIndex;
 }
 
@@ -162,6 +170,32 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   return indexPaths;
 }
 
+# pragma mark ------ SUPPLEMENTARY VIEW METHODS FOR CHANNELS --------
+// Calculate the Y Coordinate of each channel
+- (NSInteger) channelIndexFromYCoordinate:(CGFloat)yPosition{
+  NSInteger stationIndex = MAX((NSInteger)0, (NSInteger)(yPosition - HourHeaderHeight) / ChannelHeaderHeight);
+  NSLog(@"stationindex %ld", stationIndex);
+  return stationIndex;
+}
+
+
+// Return index path for the stations
+- (NSArray *)indexPathsOfChannelHeaderViewsInRect:(CGRect)rect
+{
+  if (CGRectGetMinX(rect) > ChannelHeaderWidth) {
+    return [NSArray array];
+  }
+
+  NSInteger minChannelIndex = [self channelIndexFromYCoordinate:CGRectGetMinY(rect)];
+  NSInteger maxChannelIndex = [self channelIndexFromYCoordinate:CGRectGetMaxY(rect)];
+
+  NSMutableArray *indexPaths = [NSMutableArray array];
+  for (NSInteger idx = minChannelIndex; idx <= maxChannelIndex; idx++) {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:idx inSection:0];
+    [indexPaths addObject:indexPath];
+  }
+  return indexPaths;
+}
 
 # pragma mark ----- HELPER METHODS ------
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath{
