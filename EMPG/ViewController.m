@@ -1,54 +1,78 @@
-
 #import "ViewController.h"
 #import "EPGCollectionViewCell.h"
+#import "TimeCell.h"
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
 
-@interface ViewController (){
+
+// Interface of the View Controller
+@interface ViewController () <UICollectionViewDelegateFlowLayout>{
   UICollectionView *collectionView;
-  //NSArray *fakeDescrip;
-  // NSArray *allTitles;
-  NSInteger sectionCount;
+  UICollectionViewFlowLayout *flowLayout;
+  NSArray *fakeDescrip;
   EPGRenderer *epg;
+  NSString *timeCellIdentifier;
 }
+- (void) createEPG;
 @end
 
+// Implementation of the View Controller
 @implementation ViewController
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  sectionCount = 0;
-  // Do any additional setup after loading the view, typically from a nib.
+
+  
+  // Register class method
+  
+  NSString *const HourHeaderView = @"HourHeaderView";
+  timeCellIdentifier = NSStringFromClass([TimeCell class]);
+  // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
+  
+  // Create an epg object
   [self createEPG];
+  
+  fakeDescrip = @[@"D1", @"D2", @"D3", @"D4"];
+  
   // Set Data Source and Delegate and Cell ID
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
   [collectionView setDataSource:self];
   [collectionView setDelegate: self];
   [collectionView registerClass:[EPGCollectionViewCell class] forCellWithReuseIdentifier:@"epgCell"];
+  [collectionView registerClass:[TimeCell class]
+     forSupplementaryViewOfKind: HourHeaderView
+            withReuseIdentifier: timeCellIdentifier];
   [collectionView setBackgroundColor:[UIColor whiteColor]];
   collectionView.directionalLockEnabled = true;
   [self.view addSubview:collectionView];
-  
+  //time indicator layer
   CAShapeLayer *currentTimeIndicator = [self drawCurrentTime];
   [self.view.layer addSublayer:currentTimeIndicator];
-  
-  
 }
 
+#pragma mark --------- HEADER METHOD ---------
+// Set a size for the header file first
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+referenceSizeForHeaderInSection:(NSInteger)section {
+  return CGSizeMake(60.0f, 60.0f);
+}
+
+
+#pragma mark ---------  CREATING THE CELL ---------
 // Return how many rows within UI Collection View
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
-  NSInteger row = epg.stations.count;
-  // NSLog(@"This is the row count %d", row);
+  NSInteger row = [epg.stations count];
   return row;
 }
 
 
-// Return how many collumns within UI Collection View
+// Return how many columns within UI Collection View
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{
-  NSInteger column = epg.stations[section].airings.count;
+  NSInteger column = [epg.stations[section].airings count];
   //add one to accomodate the first video thumbnail cell
   return column+1;
 }
@@ -67,27 +91,17 @@
   return cell;
 }
 
-//
-//// Set the size of the cell
-//- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath{
-//  //NSLog(@"sizeForItemAtIndexPath is called");
-//  return CGSizeMake(200, 100);
-//}
-
-// Set padding between the cell
-//- (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
-//  return UIEdgeInsetsMake(30, 0, 20, 0);
-//}
-
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
+  TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: @"HourHeaderView" withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
+  return timeCell;
+}
 
 // Dispose of any resources that can be recreated.
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
 }
 
--(void) customCellSize{
-  
-}
+#pragma mark --------- TimeIndicatorLine ---------
 
 -(CAShapeLayer *) drawCurrentTime{
   UIBezierPath *path = [UIBezierPath bezierPath];
@@ -108,6 +122,7 @@
   return shapeLayer;
 }
 
+#pragma mark --------- CREATE THE EPG ---------
 - (void) createEPG{
   
   // Timestamp generator;
@@ -152,8 +167,6 @@
       NSLocale* currentLocale = [NSLocale currentLocale];
       airing.airingStartTime = [NSDate date];
       airing.airingEndTime = [NSDate dateWithTimeInterval:arc4random() % (to-from+1) sinceDate:airing.airingStartTime];
-      // NSLog(@"This is the current %@", airing.airingEndTime);
-      //airing.airingEndTime =  timestamp + (int)from + arc4random() % (to-from+1);
       [station.airings addObject:airing];
     }
     
