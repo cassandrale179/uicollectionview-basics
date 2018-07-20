@@ -10,17 +10,22 @@ CGFloat borderPadding = 30;
 CGFloat timeInterval = 30;
 CGFloat currentTime = 15;
 CGFloat endTime = 25;
-CGFloat firstTime = 0;//first time showing on the screen
+CGFloat firstTime = 0;                                          //first time showing on the screen
 EPGRenderer *epg;
 CGFloat yPadding = 50;
 Boolean needSetup = true;
 
-// Constants for the hour header
-static const NSUInteger Hours = 3;                          // display show within next 7 hours
-static const CGFloat HourHeaderHeight = 40;                 // height of the header
-static const CGFloat ChannelHeaderWidth = 100;
-static const CGFloat ThumbnailSize = 0.5;
+// Constants
+static const NSUInteger HalfHours = 3;                          // display show within next 3 half-hour
+static const NSUInteger StationsInColumn = 10;                  // list of stations to display
+static const CGFloat HourHeaderHeight = 40;                     // height of each time cell
+static const CGFloat ChannelHeaderHeight = 50;                  // height of each channel cell
+static const CGFloat ChannelHeaderWidth = 100;                  // width of each channel cell
+static const CGFloat ThumbnailSize = 0.5;                       // size of the video thumbnail
 
+
+
+// Return content size here
 - (CGSize)collectionViewContentSize{
   return contentSize;
 }
@@ -31,7 +36,6 @@ static const CGFloat ThumbnailSize = 0.5;
   // Calculating the bounds (origin x and y) of the cells
   if(needSetup){
     [self createEPG];
-    NSLog(@"This is the new epg !%@", epg);
     needSetup = false;
   }
 
@@ -79,7 +83,7 @@ static const CGFloat ThumbnailSize = 0.5;
 // Return the frame for each cell (333.333 0; 200 100)
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect{
 
-    NSMutableArray *attributesInRect = [[NSMutableArray alloc] init];
+  NSMutableArray *attributesInRect = [[NSMutableArray alloc] init];
 
   // Array for normal airing cells
   for(NSIndexPath *indexPath in cellAttrDict){
@@ -96,8 +100,15 @@ static const CGFloat ThumbnailSize = 0.5;
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
     if(CGRectIntersectsRect(rect, attributes.frame)){
       [attributesInRect addObject:attributes];
-
     }
+  }
+
+
+  // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
+  NSArray *stationHeaderIndexPaths = [self indexPathsOfStationHeaderViewsInRect:rect];
+  for (NSIndexPath *indexPath in stationHeaderIndexPaths) {
+    UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"StationHeaderView" atIndexPath:indexPath];
+    [attributesInRect addObject:attributes];
   }
   return attributesInRect;
 }
@@ -106,14 +117,20 @@ static const CGFloat ThumbnailSize = 0.5;
 - (UICollectionViewLayoutAttributes *) layoutAttributesForSupplementaryViewOfKind:(NSString *)kind
                                                                       atIndexPath:(NSIndexPath *)indexPath{
   UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
-   CGFloat totalWidth = [self collectionViewContentSize].width;
+  CGFloat totalWidth = [self collectionViewContentSize].width;
 
   // If it's the hour header view, draw the frame for it
   if ([kind isEqualToString:@"HourHeaderView"]) {
     CGFloat availableWidth = totalWidth - ChannelHeaderWidth;
-    CGFloat widthPerHalfHour = availableWidth / Hours;
+    CGFloat widthPerHalfHour = availableWidth / HalfHours;
     attributes.frame = CGRectMake(ChannelHeaderWidth + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, HourHeaderHeight);
-    // attributes.zIndex = -10;
+    attributes.zIndex = -10;
+  }
+
+  // If it's the station header view, draw the frame for it
+  else if ([kind isEqualToString:@"StationHeaderView"]) {
+    attributes.frame = CGRectMake(0, HourHeaderHeight + ChannelHeaderHeight * indexPath.item, totalWidth, ChannelHeaderHeight);
+    attributes.zIndex = -10;
   }
   return attributes;
 }
@@ -122,8 +139,9 @@ static const CGFloat ThumbnailSize = 0.5;
 - (NSInteger)hourIndexFromXCoordinate:(CGFloat)xPosition
 {
   CGFloat contentWidth = [self collectionViewContentSize].width - ChannelHeaderWidth;          // width of the entire UICollectionView
-  CGFloat widthPerHalfHour = contentWidth / Hours;                                             // width for each hour cell = content / 3
+  CGFloat widthPerHalfHour = contentWidth / HalfHours;                                         // width for each hour cell = content / 3
   NSInteger hourIndex = MAX((NSInteger)0, (NSInteger)((xPosition - ChannelHeaderWidth) / widthPerHalfHour));
+  NSLog(@"hour index %ld", hourIndex);
   return hourIndex;
 }
 
