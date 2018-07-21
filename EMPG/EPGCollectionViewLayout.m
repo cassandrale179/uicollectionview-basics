@@ -45,7 +45,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
     for(int section = 0; section<self.collectionView.numberOfSections; section++){
       if([self.collectionView numberOfItemsInSection:section] > 0){
-        CGFloat xPos = ChannelHeaderWidth;
+        CGFloat xPos = ChannelHeaderWidth+100;
         CGFloat yPos = yPadding+section*CELL_HEIGHT+borderPadding*section;
 
         // Calculate the frame of each airing
@@ -112,11 +112,22 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
   for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
-    NSLog(@"attribute in channel header %@", attributes);
+
+
+    // Make the network header scrolling pin to the left when scrolling horizontally
+    CGPoint const contentOffset = self.collectionView.contentOffset;
+    if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
+      CGPoint origin = attributes.frame.origin;
+      origin.x = contentOffset.x;
+      attributes.zIndex = 1024;
+      attributes.frame = (CGRect){
+        .origin = origin,
+        .size = attributes.frame.size
+      };
+    }
     [attributesInRect addObject:attributes];
   }
 
-//  NSLog(@"attribute in rect %@", attributesInRect);
   return attributesInRect;
 }
 

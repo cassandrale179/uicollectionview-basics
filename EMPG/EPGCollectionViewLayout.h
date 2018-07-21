@@ -1,6 +1,5 @@
 
 #import <UIKit/UIKit.h>
 
-@interface EPGCollectionViewLayout : UICollectionViewLayout
-
+@interface EPGCollectionViewLayout : UICollectionViewFlowLayout
 @end
