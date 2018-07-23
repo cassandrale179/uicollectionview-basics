@@ -30,7 +30,7 @@
   // Register class method
   timeIndicatorKind = @"TimeIndicatorView";
   NSString *const HourHeaderView = @"HourHeaderView";
-
+  timeIndicatorIdentifier = NSStringFromClass([timeIndicatorKind class]);
   timeCellIdentifier = NSStringFromClass([TimeCell class]);
   stationCellIdentifier = NSStringFromClass([StationCell class]);
 
