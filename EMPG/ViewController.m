@@ -2,6 +2,7 @@
 #import "EPGCollectionViewCell.h"
 #import "TimeCell.h"
 #import "TimeIndicatorCell.h"
+#import "StationCell.h"
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
 
@@ -10,11 +11,11 @@
 @interface ViewController () <UICollectionViewDelegateFlowLayout>{
   UICollectionView *collectionView;
   UICollectionViewFlowLayout *flowLayout;
-  NSArray *fakeDescrip;
   EPGRenderer *epg;
   NSString *timeCellIdentifier;
   NSString *timeIndicatorIdentifier;
   NSString *timeIndicatorKind;
+  NSString *stationCellIdentifier;
 }
 - (void) createEPG;
 @end
@@ -23,15 +24,16 @@
 @implementation ViewController
 
 - (void)viewDidLoad {
+  
   [super viewDidLoad];
-
-
+  
   // Register class method
   timeIndicatorKind = @"TimeIndicatorView";
   NSString *const HourHeaderView = @"HourHeaderView";
-  
+
   timeCellIdentifier = NSStringFromClass([TimeCell class]);
-  timeIndicatorIdentifier = NSStringFromClass([TimeCell class]);
+  stationCellIdentifier = NSStringFromClass([StationCell class]);
+
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -39,21 +41,32 @@
   // Create an epg object
   [self createEPG];
 
-  fakeDescrip = @[@"D1", @"D2", @"D3", @"D4"];
-
   // Set Data Source and Delegate and Cell ID
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
   [collectionView setDataSource:self];
   [collectionView setDelegate: self];
+
+
+  // Register Class Method goes here
   [collectionView registerClass:[EPGCollectionViewCell class] forCellWithReuseIdentifier:@"epgCell"];
+  
+
   [collectionView registerClass:[TimeCell class]
-     forSupplementaryViewOfKind: HourHeaderView
+     forSupplementaryViewOfKind: @"HourHeaderView"
             withReuseIdentifier: timeCellIdentifier];
-  [collectionView registerClass:[TimeIndicatorCell class] forSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier];
+  [collectionView registerClass: [StationCell class]
+   forSupplementaryViewOfKind: @"ChannelHeaderView"
+            withReuseIdentifier: stationCellIdentifier];
+  [collectionView registerClass:[TimeIndicatorCell class] 
+      forSupplementaryViewOfKind:timeIndicatorKind 
+      withReuseIdentifier:timeIndicatorIdentifier];
+  
+
+
+  // Set background color and disable scrolling diagonally
   [collectionView setBackgroundColor:[UIColor whiteColor]];
   collectionView.directionalLockEnabled = true;
   [self.view addSubview:collectionView];
-  
 }
 
 #pragma mark --------- HEADER METHOD ---------
@@ -95,20 +108,29 @@ referenceSizeForHeaderInSection:(NSInteger)section {
 }
 
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
-  UICollectionReusableView *cell;
-  if([kind isEqualToString:@"HourHeaderView"]){
-    cell = [collectionView dequeueReusableSupplementaryViewOfKind: @"HourHeaderView" withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
-  }else if([kind isEqualToString:timeIndicatorKind]){
-    cell = [collectionView dequeueReusableSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier forIndexPath:indexPath];
+#pragma mark ---------  METHODS FOR SUPPLEMENTARY VIEW ---------
+// Dequeue method for time cell
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+           viewForSupplementaryElementOfKind:(NSString *)kind
+                                 atIndexPath:(NSIndexPath *)indexPath{
+
+  if ([kind isEqualToString:@"HourHeaderView"]){
+    TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: @"HourHeaderView" withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
+    return timeCell;
+
   }
-  return cell;
+  else if ([kind isEqualToString:@"ChannelHeaderView"]){
+    StationCell *stationCell  = [collectionView dequeueReusableSupplementaryViewOfKind: @"ChannelHeaderView" withReuseIdentifier:stationCellIdentifier forIndexPath:indexPath];
+    return stationCell;
+  }
+  else if([kind isEqualToString:timeIndicatorKind]){
+    TimeIndicatorCell *timeIndicatorCell = [collectionView dequeueReusableSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier forIndexPath:indexPath];
+    return timeIndicatorCell;
+  }
+  return 0;
+
 }
 
-// Dispose of any resources that can be recreated.
-- (void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning];
-}
 
 #pragma mark --------- CREATE THE EPG ---------
 - (void) createEPG{
@@ -162,4 +184,10 @@ referenceSizeForHeaderInSection:(NSInteger)section {
     [epg.stations addObject:station];
   }
 }
+
+// Dispose of any resources that can be recreated.
+- (void)didReceiveMemoryWarning {
+  [super didReceiveMemoryWarning];
+}
+
 @end
