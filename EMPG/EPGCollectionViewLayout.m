@@ -102,9 +102,19 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   NSLog(@"array count for hour %ld", [hourHeaderViewIndexPaths count]);
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
-    if(CGRectIntersectsRect(rect, attributes.frame)){
-      [attributesInRect addObject:attributes];
+    
+    // Make the network header scrolling pin to the left when scrolling horizontally
+    CGPoint const contentOffset = self.collectionView.contentOffset;
+    if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
+      CGPoint origin = attributes.frame.origin;
+      origin.x = contentOffset.x;
+      attributes.zIndex = 1024;
+      attributes.frame = (CGRect){
+        .origin = origin,
+        .size = attributes.frame.size
+      };
     }
+    [attributesInRect addObject:attributes];
   }
   
 
