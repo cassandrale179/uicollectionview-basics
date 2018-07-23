@@ -120,7 +120,7 @@ C. Implement a method to initialize / create an EPG object:
 ```
 
 
-### 2. Create cells for the UICollection View 
+### 2. Create An UICollectionView
 1. There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
 - For each cell, create a class and method files associated with it 
 - E.g, implementation for the station cell: 
@@ -143,7 +143,7 @@ if (self) {
 
 
 
-#### 3. Create the Flow Layout for the UICollectionView 
+### 3. Create the Flow Layout for the UICollectionView 
 1. Customize your own collection view layout as part of UICollectionViewFlowLayout 
 ``` 
 @interface EPGCollectionViewLayout : UICollectionViewFlowLayout
