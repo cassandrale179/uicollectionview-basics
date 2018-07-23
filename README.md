@@ -3,6 +3,14 @@ This guide is to create an Objective C UICollectionView programmatically (withou
 This is a log for future documentation purpose. 
 
 
+## Table of Contents 
+1. Create an EPG object
+ A. Structure of an EPG
+ B. Implementation of an EPG in Objective C class
+ C. Method to create an EPG object 
+
+
+## Steps By Steps Instruction 
 ### 1. Create an EPG object 
  A. An EPG is a menu is displayed that lists current and upcoming television programs on all available channels.  <br>
  The structure of an EPG will look like follow: 
