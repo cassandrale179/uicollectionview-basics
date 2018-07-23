@@ -2,10 +2,16 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:/google/src/cloud/cassandrale/myworkspace/google3/experimental/users/cassandrale/EMPG/EMPG/EPGRenderer.m">
+      location = "group:/Users/cassandrale/Desktop/EMPGfolder/EMPG/StationCell.h">
    </FileRef>
    <FileRef
-      location = "group:/google/src/cloud/cassandrale/myworkspace/google3/experimental/users/cassandrale/EMPG/EMPG/EPGRenderer.h">
+      location = "group:/Users/cassandrale/Desktop/EMPGfolder/EMPG/StationCell.m">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/cassandrale/Desktop/EMPGfolder/EMPG/TimeCell.h">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/cassandrale/Desktop/EMPGfolder/EMPG/TimeCell.m">
    </FileRef>
    <FileRef
       location = "self:">

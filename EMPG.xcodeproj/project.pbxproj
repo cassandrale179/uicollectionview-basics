@@ -19,6 +19,8 @@
 		606F00E220FEAF9F00DCD67E /* EPGCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00DC20FEAF9F00DCD67E /* EPGCollectionViewCell.m */; };
 		606F00E320FEAF9F00DCD67E /* EPGCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */; };
 		606F00E420FEAF9F00DCD67E /* DataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00E120FEAF9F00DCD67E /* DataModel.m */; };
+		60F09909210672D300E33A94 /* StationCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F09905210672D300E33A94 /* StationCell.m */; };
+		60F0990A210672D300E33A94 /* TimeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F09908210672D300E33A94 /* TimeCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +63,10 @@
 		606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EPGCollectionViewLayout.m; sourceTree = "<group>"; };
 		606F00E020FEAF9F00DCD67E /* EPGCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EPGCollectionViewLayout.h; sourceTree = "<group>"; };
 		606F00E120FEAF9F00DCD67E /* DataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataModel.m; sourceTree = "<group>"; };
+		60F09905210672D300E33A94 /* StationCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StationCell.m; path = /Users/cassandrale/Desktop/EMPGfolder/EMPG/StationCell.m; sourceTree = "<absolute>"; };
+		60F09906210672D300E33A94 /* StationCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StationCell.h; path = /Users/cassandrale/Desktop/EMPGfolder/EMPG/StationCell.h; sourceTree = "<absolute>"; };
+		60F09907210672D300E33A94 /* TimeCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TimeCell.h; path = /Users/cassandrale/Desktop/EMPGfolder/EMPG/TimeCell.h; sourceTree = "<absolute>"; };
+		60F09908210672D300E33A94 /* TimeCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TimeCell.m; path = /Users/cassandrale/Desktop/EMPGfolder/EMPG/TimeCell.m; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +117,10 @@
 		601833CD20FD717800F94150 /* EMPG */ = {
 			isa = PBXGroup;
 			children = (
+				60F09906210672D300E33A94 /* StationCell.h */,
+				60F09905210672D300E33A94 /* StationCell.m */,
+				60F09907210672D300E33A94 /* TimeCell.h */,
+				60F09908210672D300E33A94 /* TimeCell.m */,
 				606F00DD20FEAF9F00DCD67E /* DataModel.h */,
 				606F00E120FEAF9F00DCD67E /* DataModel.m */,
 				606F00DE20FEAF9F00DCD67E /* EPGCollectionViewCell.h */,
@@ -280,8 +290,10 @@
 			files = (
 				601833D320FD717900F94150 /* ViewController.m in Sources */,
 				606F00E320FEAF9F00DCD67E /* EPGCollectionViewLayout.m in Sources */,
+				60F09909210672D300E33A94 /* StationCell.m in Sources */,
 				601833DE20FD717A00F94150 /* main.m in Sources */,
 				606F00E220FEAF9F00DCD67E /* EPGCollectionViewCell.m in Sources */,
+				60F0990A210672D300E33A94 /* TimeCell.m in Sources */,
 				606F00E420FEAF9F00DCD67E /* DataModel.m in Sources */,
 				601833D020FD717800F94150 /* AppDelegate.m in Sources */,
 				6018340C20FE8AC900F94150 /* (null) in Sources */,
