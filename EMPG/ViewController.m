@@ -121,6 +121,7 @@ referenceSizeForHeaderInSection:(NSInteger)section {
   }
   else if ([kind isEqualToString:@"ChannelHeaderView"]){
     StationCell *stationCell  = [collectionView dequeueReusableSupplementaryViewOfKind: @"ChannelHeaderView" withReuseIdentifier:stationCellIdentifier forIndexPath:indexPath];
+    [stationCell setup: epg.stations[indexPath.section].stationName];
     return stationCell;
   }
   else if([kind isEqualToString:timeIndicatorKind]){
