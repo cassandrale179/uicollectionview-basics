@@ -134,24 +134,20 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 - (UICollectionViewLayoutAttributes *) layoutAttributesForSupplementaryViewOfKind:(NSString *)kind
                                                                       atIndexPath:(NSIndexPath *)indexPath{
   UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
-  CGFloat totalWidth = [self collectionViewContentSize].width;
 
-  // If it's the hour header view 
   if ([kind isEqualToString:@"HourHeaderView"]) {
     CGFloat widthPerHalfHour = CELL_WIDTH;
     CGFloat paddingSize = ThumbnailSize*CELL_WIDTH;
     attributes.frame = CGRectMake(ChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, HourHeaderHeight);
   }
-   // If it's the station header view                                                                      
-   else if ([kind isEqualToString:@"ChannelHeaderView"]) {
-     NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
-     
-     //Finding frame of the airing cell as reference.
-     UICollectionViewLayoutAttributes *attr = [cellAttrDict objectForKey:channelIndex];
-     attributes.frame = CGRectMake(0, attr.frame.origin.y, ChannelHeaderWidth, ChannelHeaderHeight);
-  } 
- // If it's the time indicator view  
- else if([kind isEqualToString:timeIndicatorKind]){
+  else if ([kind isEqualToString:@"ChannelHeaderView"]) {
+    NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
+    
+    //Finding frame of the airing cell as reference.
+    UICollectionViewLayoutAttributes *attr = [cellAttrDict objectForKey:channelIndex];
+    attributes.frame = CGRectMake(0, attr.frame.origin.y, ChannelHeaderWidth, ChannelHeaderHeight);
+  }
+  else if([kind isEqualToString:timeIndicatorKind]){
     CGFloat cellStandardWidth = 400;
     NSDate *timeAtFront = [NSDate date];
     CGFloat currentTimeMarker = [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront]/(60*30.)*cellStandardWidth;

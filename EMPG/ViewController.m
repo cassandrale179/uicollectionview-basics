@@ -116,6 +116,7 @@ referenceSizeForHeaderInSection:(NSInteger)section {
                                  atIndexPath:(NSIndexPath *)indexPath{
   if ([kind isEqualToString:timeCellKind]){
     TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: timeCellKind withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
+    [timeCell setup: [NSString stringWithFormat:@"%ld:00 PM", indexPath.item]];
     return timeCell;
   }
   else if ([kind isEqualToString:@"ChannelHeaderView"]){
