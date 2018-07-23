@@ -99,7 +99,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
   // Supplementary view for the header of the hours (9:00 PM - 10:00 PM)
   NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViewsInRect:rect];
-  NSLog(@"array count for hour %ld", [hourHeaderViewIndexPaths count]);
+  //NSLog(@"array count for hour %ld", [hourHeaderViewIndexPaths count]);
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
     [attributesInRect addObject:attributes];
@@ -108,7 +108,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
   // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
   NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViewsInRect:rect];
-  NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
+  //NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
   for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
     // Make the network header scrolling pin to the left when scrolling horizontally
@@ -122,6 +122,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
         .size = attributes.frame.size
       };
     }
+    NSLog(@"For the index %@ the attr is %@", indexPath, attributesInRect);
     [attributesInRect addObject:attributes];
   }
   
@@ -147,7 +148,11 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   }
    // If it's the station header view                                                                      
    else if ([kind isEqualToString:@"ChannelHeaderView"]) {
-    attributes.frame = CGRectMake(0, HourHeaderHeight + ChannelHeaderHeight * indexPath.item, ChannelHeaderWidth, ChannelHeaderHeight);
+     NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
+     //Finding frame of the airing cell as reference.
+     UICollectionViewLayoutAttributes *attr = [cellAttrDict objectForKey:channelIndex];
+     //NSLog(@"getting the attr for %@ ", attr);
+    attributes.frame = CGRectMake(0, attr.frame.origin.y, ChannelHeaderWidth, ChannelHeaderHeight);
   } 
  // If it's the time indicator view  
  else if([kind isEqualToString:timeIndicatorKind]){
@@ -190,9 +195,10 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 # pragma mark ------ SUPPLEMENTARY VIEW METHODS FOR CHANNELS --------
 // Calculate the Y Coordinate of each channel
 - (NSInteger) channelIndexFromYCoordinate:(CGFloat)yPosition{
-  NSInteger stationIndex = MAX((NSInteger)0, (NSInteger)(yPosition - HourHeaderHeight) / ChannelHeaderHeight);
-  NSLog(@"stationindex %ld", stationIndex);
-  return stationIndex;
+  //changing the way this is calculated to be from the actual number of channels
+//  NSInteger stationIndex = MAX((NSInteger)0, (NSInteger)(yPosition - HourHeaderHeight) / ChannelHeaderHeight);
+//  NSLog(@"stationindex %ld", stationIndex);
+  return epg.stations.count;
 }
 
 
@@ -203,12 +209,12 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
     return [NSArray array];
   }
 
-  NSInteger minChannelIndex = [self channelIndexFromYCoordinate:CGRectGetMinY(rect)];
-  NSInteger maxChannelIndex = [self channelIndexFromYCoordinate:CGRectGetMaxY(rect)];
-
+  NSInteger minChannelIndex = 0;
+  NSInteger maxChannelIndex = [self channelIndexFromYCoordinate:CGRectGetMaxY(rect)]-1;
   NSMutableArray *indexPaths = [NSMutableArray array];
   for (NSInteger idx = minChannelIndex; idx <= maxChannelIndex; idx++) {
-    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:idx inSection:0];
+    //changed rev indexpath and section
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:idx];
     [indexPaths addObject:indexPath];
   }
   return indexPaths;

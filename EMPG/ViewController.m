@@ -118,8 +118,9 @@ referenceSizeForHeaderInSection:(NSInteger)section {
     TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: timeCellKind withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
     return timeCell;
   }
-  else if ([kind isEqualToString: stationCellKind]){
-    StationCell *stationCell  = [collectionView dequeueReusableSupplementaryViewOfKind: stationCellKind withReuseIdentifier:stationCellIdentifier forIndexPath:indexPath];
+  else if ([kind isEqualToString:@"ChannelHeaderView"]){
+    StationCell *stationCell  = [collectionView dequeueReusableSupplementaryViewOfKind: @"ChannelHeaderView" withReuseIdentifier:stationCellIdentifier forIndexPath:indexPath];
+    [stationCell setup: epg.stations[indexPath.section].stationName];
     return stationCell;
   }
   else if([kind isEqualToString:timeIndicatorKind]){

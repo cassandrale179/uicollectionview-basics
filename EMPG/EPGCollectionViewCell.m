@@ -26,7 +26,7 @@ CGFloat xPadding;
 }
 
 -(void) setup: (NSString *) titleText withDescription:(NSString *)descriptionText {
-  NSLog(@"This is the width: %f", self.layer.frame.size.width);
+  //NSLog(@"This is the width: %f", self.layer.frame.size.width);
   self.layer.borderWidth = 2.0f;
   self.layer.borderColor = [UIColor blackColor].CGColor;
   self.title.text = titleText;
