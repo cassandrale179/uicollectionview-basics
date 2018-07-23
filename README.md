@@ -8,6 +8,14 @@ This is a log for future documentation purpose.
 - A. Structure of an EPG <br>
 - B. Implementation of an EPG in Objective C class <br>
 - C. Method to create an EPG object <br>
+**2. Creating UICollectionView** <br>
+- A. Create the cell for the collectionview (Emily) <br>
+- B. Create the flow layout for the collection view (Emily) <br>
+- C. Add the cell and flow layout to the view controller (Emily) <br>
+- D. Create supplementary view for the time and station cell (Minh) <br>
+- E. Add supplementary view to the view controller (Minh) <br>
+- F. Create supplementary view for the time indicator line (Emily) <br> 
+
 
 
 ## Steps By Steps Instruction 
