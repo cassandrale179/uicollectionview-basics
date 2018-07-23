@@ -32,7 +32,7 @@ This is a log for future documentation purpose.
 
 The creationg of an EPG object (DataModel.h) files:    
    
- ```
+ ```objective-c
 @interface AiringRenderer : NSObject
 @property (nonatomic, readwrite) NSString *airingTitle;;
 @property (nonatomic, readwrite) NSDate *airingStartTime;
