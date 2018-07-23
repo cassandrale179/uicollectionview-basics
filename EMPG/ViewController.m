@@ -36,7 +36,7 @@
 
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
-  self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  //self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
   // Create an epg object
   [self createEPG];
@@ -62,11 +62,11 @@
       withReuseIdentifier:timeIndicatorIdentifier];
   
 
-
+  self.view = collectionView;
   // Set background color and disable scrolling diagonally
   [collectionView setBackgroundColor:[UIColor whiteColor]];
   collectionView.directionalLockEnabled = true;
-  [self.view addSubview:collectionView];
+ // [self.view addSubview:collectionView];
 }
 
 #pragma mark --------- HEADER METHOD ---------
