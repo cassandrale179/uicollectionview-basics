@@ -21,7 +21,8 @@ This is a log for future documentation purpose.
 
 ## Steps By Steps Instruction 
 ### 1. Create an EPG object 
- A. An EPG is a menu is displayed that lists current and upcoming television programs on all available channels.  <br>
+ ##### A. Structure of an EPG object:
+ An EPG is a menu is displayed that lists current and upcoming television programs on all available channels.  <br>
  The structure of an EPG will look like follow: 
 
     epg/
@@ -45,7 +46,7 @@ This is a log for future documentation purpose.
         ├── title 
         ... 
 
-B. The creationg of an EPG object (DataModel.h) files:    
+#### B. The creationg of an EPG object (DataModel.h) files:    
    
  ```objective-c
 // Each airing object is a TV show / movie 
@@ -74,7 +75,8 @@ B. The creationg of an EPG object (DataModel.h) files:
 @end
 ``` 
 
-C. Implement a method to initialize / create an EPG object: 
+#### C. Implement a method to initialize / create an EPG object: 
+We create a double for loop to fill the content of the station cell, then put each station cell within an EPG object, then fill the content of each airing renderer cell, then put it in the station renderer object. 
 ```objective-c
 - (void) createEPG{
 
@@ -121,8 +123,9 @@ C. Implement a method to initialize / create an EPG object:
 
 
 ### 2. Create An UICollectionView
+#### D. Create supplementary view for the time and station cell  
 1. There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
-- For each cell, create a class and method files associated with it 
+- For station cell (StationCell.h) and time cell (TimeCell.h) create a class and method files associated with it 
 - E.g, implementation for the station cell: 
 ```objective-c
 if (self) {
@@ -143,14 +146,9 @@ if (self) {
 
 
 
-### 3. Create the Flow Layout for the UICollectionView 
-1. Customize your own collection view layout as part of UICollectionViewFlowLayout 
-``` 
-@interface EPGCollectionViewLayout : UICollectionViewFlowLayout
-@end
-```
 
 
-2. Implement method for the airing cell
-A. Create a method for the layout for normal airing cells (Emily's part)
+
+
+
    
