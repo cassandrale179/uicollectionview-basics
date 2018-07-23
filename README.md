@@ -103,7 +103,35 @@ C. Implement a method to initialize / create an EPG object:
 ```
 
 
-### 2. Create a layout for UI Collection View
+### 2. Create cells for the UICollection View 
+1. There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
+- For each cell, create a class and method files associated with it 
+- E.g, implementation for the station cell: 
+```objective-c
+if (self) {
+    self.title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 30)];
+    self.descriptionText.textColor = [UIColor blackColor];
+    [self.contentView addSubview:self.title];
+    [self.contentView addSubview:self.thumbnailView];
+  }
+  
+  // Setup method 
+  -(void) setup: (NSString *) titleText withDescription:(NSString *)descriptionText {
+  self.layer.borderWidth = 2.0f;
+  self.title.text = titleText;
+  self.title.frame = CGRectMake(10, 10, self.layer.frame.size.width-(2*xPadding), 30);
+}
+``` 
 
 
+
+
+#### 3. Create the Flow Layout for the UICollectionView 
+1. Customize your own collection view layout as part of UICollectionViewFlowLayout 
+``` 
+@interface EPGCollectionViewLayout : UICollectionViewFlowLayout
+@end
+```
+
+ 
    
