@@ -96,10 +96,8 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
     }
   }
 
-
   // Supplementary view for the header of the hours (9:00 PM - 10:00 PM)
   NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViewsInRect:rect];
-  //NSLog(@"array count for hour %ld", [hourHeaderViewIndexPaths count]);
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
     [attributesInRect addObject:attributes];
@@ -108,7 +106,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
   // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
   NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViewsInRect:rect];
-  //NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
   for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
     // Make the network header scrolling pin to the left when scrolling horizontally
@@ -122,7 +119,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
         .size = attributes.frame.size
       };
     }
-    NSLog(@"For the index %@ the attr is %@", indexPath, attributesInRect);
     [attributesInRect addObject:attributes];
   }
   
@@ -142,17 +138,17 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
   // If it's the hour header view 
   if ([kind isEqualToString:@"HourHeaderView"]) {
-    CGFloat availableWidth = totalWidth - ChannelHeaderWidth;
-    CGFloat widthPerHalfHour = availableWidth / HalfHours;
-    attributes.frame = CGRectMake(ChannelHeaderWidth + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, HourHeaderHeight);
+    CGFloat widthPerHalfHour = CELL_WIDTH;
+    CGFloat paddingSize = ThumbnailSize*CELL_WIDTH;
+    attributes.frame = CGRectMake(ChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, HourHeaderHeight);
   }
    // If it's the station header view                                                                      
    else if ([kind isEqualToString:@"ChannelHeaderView"]) {
      NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
+     
      //Finding frame of the airing cell as reference.
      UICollectionViewLayoutAttributes *attr = [cellAttrDict objectForKey:channelIndex];
-     //NSLog(@"getting the attr for %@ ", attr);
-    attributes.frame = CGRectMake(0, attr.frame.origin.y, ChannelHeaderWidth, ChannelHeaderHeight);
+     attributes.frame = CGRectMake(0, attr.frame.origin.y, ChannelHeaderWidth, ChannelHeaderHeight);
   } 
  // If it's the time indicator view  
  else if([kind isEqualToString:timeIndicatorKind]){
@@ -182,8 +178,8 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   if (CGRectGetMinY(rect) > HourHeaderHeight) {
     return [NSArray array];
   }
-  NSInteger minHourIndex = [self hourIndexFromXCoordinate:CGRectGetMinX(rect)];
-  NSInteger maxHourIndex = [self hourIndexFromXCoordinate:CGRectGetMaxX(rect)];
+  NSInteger minHourIndex = 0;
+  NSInteger maxHourIndex = 9;
   NSMutableArray *indexPaths = [NSMutableArray array];
   for (NSInteger idx = minHourIndex; idx <= maxHourIndex; idx++) {
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:idx inSection:0];
@@ -196,8 +192,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 // Calculate the Y Coordinate of each channel
 - (NSInteger) channelIndexFromYCoordinate:(CGFloat)yPosition{
   //changing the way this is calculated to be from the actual number of channels
-//  NSInteger stationIndex = MAX((NSInteger)0, (NSInteger)(yPosition - HourHeaderHeight) / ChannelHeaderHeight);
-//  NSLog(@"stationindex %ld", stationIndex);
   return epg.stations.count;
 }
 
