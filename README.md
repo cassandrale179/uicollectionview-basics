@@ -8,6 +8,7 @@ This is a log for future documentation purpose.
 - A. Structure of an EPG <br>
 - B. Implementation of an EPG in Objective C class <br>
 - C. Method to create an EPG object <br>
+
 **2. Creating UICollectionView** <br>
 - A. Create the cell for the collectionview (Emily) <br>
 - B. Create the flow layout for the collection view (Emily) <br>
