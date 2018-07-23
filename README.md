@@ -4,7 +4,7 @@ This is a log for future documentation purpose.
 
 
 ### 1. Create an EPG object 
-The structure of an EPG object. An EPG is a menu is displayed that lists current and upcoming television programs on all available channels.
+ An EPG is a menu is displayed that lists current and upcoming television programs on all available channels. The structure: 
 
     epg/
     ├── FOX                      
