@@ -133,5 +133,7 @@ if (self) {
 @end
 ```
 
- 
+
+2. Implement method for the airing cell
+A. Create a method for the layout for normal airing cells (Emily's part)
    
