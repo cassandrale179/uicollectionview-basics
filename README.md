@@ -5,9 +5,9 @@ This is a log for future documentation purpose.
 
 ## Table of Contents 
 **1. Create an EPG object** <br>
- A. Structure of an EPG <br>
- B. Implementation of an EPG in Objective C class <br>
- C. Method to create an EPG object <br>
+- A. Structure of an EPG <br>
+- B. Implementation of an EPG in Objective C class <br>
+- C. Method to create an EPG object <br>
 
 
 ## Steps By Steps Instruction 
