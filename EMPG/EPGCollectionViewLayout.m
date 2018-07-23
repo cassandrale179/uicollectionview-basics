@@ -14,6 +14,7 @@ CGFloat firstTime = 0;                                          //first time sho
 EPGRenderer *epg;
 CGFloat yPadding = 50;
 Boolean needSetup = true;
+NSString *timeIndicatorKind = @"TimeIndicatorView";
 
 // Constants
 static const NSUInteger HalfHours = 3;                          // display show within next 3 half-hour
@@ -105,18 +106,20 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
       [attributesInRect addObject:attributes];
     }
   }
-
+  
 
   // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
   NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViewsInRect:rect];
   NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
   for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
-    NSLog(@"attribute in channel header %@", attributes);
     [attributesInRect addObject:attributes];
   }
+  
+   //Supplementary view for time indicator cell
+  UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"TimeIndicatorView" atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+  [attributesInRect addObject:attributes];
 
-//  NSLog(@"attribute in rect %@", attributesInRect);
   return attributesInRect;
 }
 
@@ -127,18 +130,23 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
   CGFloat totalWidth = [self collectionViewContentSize].width;
 
-  // If it's the hour header view, draw the frame for it
+  // If it's the hour header view 
   if ([kind isEqualToString:@"HourHeaderView"]) {
     CGFloat availableWidth = totalWidth - ChannelHeaderWidth;
     CGFloat widthPerHalfHour = availableWidth / HalfHours;
     attributes.frame = CGRectMake(ChannelHeaderWidth + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, HourHeaderHeight);
-    attributes.zIndex = -10;
   }
-
-  // If it's the station header view, draw the frame for it
-  else if ([kind isEqualToString:@"ChannelHeaderView"]) {
+   // If it's the station header view                                                                      
+   else if ([kind isEqualToString:@"ChannelHeaderView"]) {
     attributes.frame = CGRectMake(0, HourHeaderHeight + ChannelHeaderHeight * indexPath.item, ChannelHeaderWidth, ChannelHeaderHeight);
-//    attributes.zIndex = -10;
+  } 
+ // If it's the time indicator view  
+ else if([kind isEqualToString:timeIndicatorKind]){
+    CGFloat cellStandardWidth = 400;
+    NSDate *timeAtFront = [NSDate date];
+    CGFloat currentTimeMarker = [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront]/(60*30.)*cellStandardWidth;
+    CGFloat topOfIndicator = 20;
+    attributes.frame = CGRectMake(currentTimeMarker, topOfIndicator, 2, contentSize.height);
   }
   return attributes;
 }
@@ -196,6 +204,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   }
   return indexPaths;
 }
+
 
 # pragma mark ----- HELPER METHODS ------
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath{

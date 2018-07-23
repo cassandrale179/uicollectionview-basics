@@ -1,6 +1,7 @@
 #import "ViewController.h"
 #import "EPGCollectionViewCell.h"
 #import "TimeCell.h"
+#import "TimeIndicatorCell.h"
 #import "StationCell.h"
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
@@ -12,6 +13,8 @@
   UICollectionViewFlowLayout *flowLayout;
   EPGRenderer *epg;
   NSString *timeCellIdentifier;
+  NSString *timeIndicatorIdentifier;
+  NSString *timeIndicatorKind;
   NSString *stationCellIdentifier;
 }
 - (void) createEPG;
@@ -21,16 +24,19 @@
 @implementation ViewController
 
 - (void)viewDidLoad {
-
-  // Set cell identifier
+  
   [super viewDidLoad];
+  
+  // Register class method
+  timeIndicatorKind = @"TimeIndicatorView";
+  NSString *const HourHeaderView = @"HourHeaderView";
+
   timeCellIdentifier = NSStringFromClass([TimeCell class]);
   stationCellIdentifier = NSStringFromClass([StationCell class]);
 
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
 
   // Create an epg object
   [self createEPG];
@@ -43,22 +49,24 @@
 
   // Register Class Method goes here
   [collectionView registerClass:[EPGCollectionViewCell class] forCellWithReuseIdentifier:@"epgCell"];
+  
+
   [collectionView registerClass:[TimeCell class]
      forSupplementaryViewOfKind: @"HourHeaderView"
             withReuseIdentifier: timeCellIdentifier];
   [collectionView registerClass: [StationCell class]
    forSupplementaryViewOfKind: @"ChannelHeaderView"
             withReuseIdentifier: stationCellIdentifier];
+  [collectionView registerClass:[TimeIndicatorCell class] 
+      forSupplementaryViewOfKind:timeIndicatorKind 
+      withReuseIdentifier:timeIndicatorIdentifier];
+  
 
 
   // Set background color and disable scrolling diagonally
   [collectionView setBackgroundColor:[UIColor whiteColor]];
   collectionView.directionalLockEnabled = true;
   [self.view addSubview:collectionView];
-
-  // Time indicator layer
-  CAShapeLayer *currentTimeIndicator = [self drawCurrentTime];
-  [self.view.layer addSublayer:currentTimeIndicator];
 }
 
 #pragma mark --------- HEADER METHOD ---------
@@ -115,32 +123,14 @@ referenceSizeForHeaderInSection:(NSInteger)section {
     StationCell *stationCell  = [collectionView dequeueReusableSupplementaryViewOfKind: @"ChannelHeaderView" withReuseIdentifier:stationCellIdentifier forIndexPath:indexPath];
     return stationCell;
   }
+  else if([kind isEqualToString:timeIndicatorKind]){
+    TimeIndicatorCell *timeIndicatorCell = [collectionView dequeueReusableSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier forIndexPath:indexPath];
+    return timeIndicatorCell;
+  }
   return 0;
 
 }
 
-
-
-#pragma mark --------- TimeIndicatorLine ---------
-
--(CAShapeLayer *) drawCurrentTime{
-  UIBezierPath *path = [UIBezierPath bezierPath];
-  NSDate *timeAtFront = [NSDate date];
-
-  // will in future replace [timeAtFront dateByAddingTimeInterval:1500] w [NSDate date] for currentTime
-  // divide by seconds*timeIntervalInMinutes
-  CGFloat cellStandardWidth = 400;
-  CGFloat currentTimeMarker = [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront]/(60*30.)*cellStandardWidth;
-  CGFloat topOfIndicator = 20;
-  [path moveToPoint:CGPointMake(currentTimeMarker, topOfIndicator)];
-  [path addLineToPoint:CGPointMake(currentTimeMarker, self.view.layer.frame.size.height)];
-  CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-  shapeLayer.path = [path CGPath];
-  shapeLayer.strokeColor = [[UIColor redColor] CGColor];
-  shapeLayer.lineWidth = 3.0;
-  shapeLayer.fillColor = [[UIColor clearColor] CGColor];
-  return shapeLayer;
-}
 
 #pragma mark --------- CREATE THE EPG ---------
 - (void) createEPG{
