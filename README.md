@@ -124,7 +124,8 @@ We create a double for loop to fill the content of the station cell, then put ea
 
 ### 2. Create An UICollectionView
 #### D. Create supplementary view for the time and station cell  
-1. There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
+**1. Create cusotm time and station cell files**: 
+There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
 - For station cell (StationCell.h) and time cell (TimeCell.h) create a class and method files associated with it 
 - E.g, implementation for the station cell: 
 ```objective-c
@@ -143,6 +144,7 @@ if (self) {
 }
 ``` 
 
+**2. Modify the**
 
 
 
