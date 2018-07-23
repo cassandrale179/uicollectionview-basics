@@ -4,21 +4,19 @@ This is a log for future documentation purpose.
 
 
 ### 1. Create an EPG object 
- An EPG is a menu is displayed that lists current and upcoming television programs on all available channels.  <br>
+ A. An EPG is a menu is displayed that lists current and upcoming television programs on all available channels.  <br>
  The structure of an EPG will look like follow: 
 
     epg/
     ├── FOX                      
       ├── Airing1
         ├── start-time                      
-        ├── end-time                       
-        ├── thumbnail                      
+        ├── end-time                                          
         ├── description        
         ├── title   
       ├── Airing2  
         ├── start-time                      
-        ├── end-time                       
-        ├── thumbnail                      
+        ├── end-time                                           
         ├── description        
         ├── title                        
     ├── CNN    
@@ -30,30 +28,78 @@ This is a log for future documentation purpose.
         ├── title 
         ... 
 
-The creationg of an EPG object (DataModel.h) files:    
+B. The creationg of an EPG object (DataModel.h) files:    
    
  ```objective-c
+// Each airing object is a TV show / movie 
+
 @interface AiringRenderer : NSObject
 @property (nonatomic, readwrite) NSString *airingTitle;;
 @property (nonatomic, readwrite) NSDate *airingStartTime;
 @property (nonatomic, readwrite) NSDate *airingEndTime;
-
+@property (nonatomic, readwrite) NSString *airingDescription;
 @end
 
 
-// For each station, create a list of airings
+// Each station contain an array of airings 
 @interface StationRenderer : NSObject
 @property (nonatomic, readwrite) NSMutableArray <AiringRenderer*> *airings;
 @property (nonatomic, readwrite) NSString* stationName;
-@property (nonatomic, readwrite) UIImage* networkLogo;
+@property (nonatomic, readwrite) UIImage* stationLogo;
 @end
 
 
-// Create a list of stations
+// Each epg object contain an array of stations 
 @interface EPGRenderer : NSObject
 @property (nonatomic, readwrite) NSMutableArray<StationRenderer *> *stations;
-@property (nonatomic, readwrite) long startTime;
-@property (nonatomic, readwrite) long endTime;
+@property (nonatomic, readwrite) long epgStartTime;
+@property (nonatomic, readwrite) long epgEndTime;
 @end
 ``` 
+
+C. Implement a method to initialize / create an EPG object: 
+```objective-c
+- (void) createEPG{
+
+  // Timestamp generator;
+  int timestamp = [[NSDate date] timeIntervalSince1970];
+  int from = 900;
+  int to = 7200;
+
+  // Create a list of stations
+  epg = [[EPGRenderer alloc]init];
+  epg.stations = [[NSMutableArray alloc] init];
+  NSArray *stationTitle = [NSArray arrayWithObjects: @"fox", @"kpix5", @"abc7", @"nbc11", @"thecw", @"food", @"hgtv", @"showtime", @"premiere", @"disney",nil];
+
+  // Create arrays to fill out information
+  NSArray *d1 = [NSArray arrayWithObjects: @"New Girl", @"The Mick", @"Big Bang Theory", nil];
+  NSArray *d2 = [NSArray arrayWithObjects: @"East TN South vs Furman", @"Postgame", @"The Late Show with Stephen Colbert", nil];
+  .... 
+  NSArray *d10 = [NSArray arrayWithObjects: @"Two And A Half Man", @"Howdie Mandel All-Star Comedy Gala", nil];
+
+
+  // Create an array of stations for one epg 
+  for (int i = 0; i < [stationTitle count]; i++){
+
+    StationRenderer *station = [[StationRenderer alloc] init];
+    station.airings = [[NSMutableArray alloc] init];
+
+    // Create dummy variables for now
+    NSArray *dummyTitle = allTitles[i];
+
+    // Create an array of airings for each station
+    for (int j = 0; j < [dummyTitle count]; j++){
+      AiringRenderer *airing = [[AiringRenderer alloc] init];
+      airing.airingTitle = dummyTitle[j];
+      airing.airingStartTime = [NSDate date];
+      airing.airingEndTime = [NSDate dateWithTimeInterval:arc4random() % (to-from+1) sinceDate:airing.airingStartTime];
+      [station.airings addObject:airing];
+    }
+
+    station.stationName = stationTitle[i];
+    [epg.stations addObject:station];
+  }
+}
+```
+
    
