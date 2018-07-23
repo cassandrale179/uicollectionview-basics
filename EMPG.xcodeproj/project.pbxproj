@@ -19,6 +19,8 @@
 		606F00E220FEAF9F00DCD67E /* EPGCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00DC20FEAF9F00DCD67E /* EPGCollectionViewCell.m */; };
 		606F00E320FEAF9F00DCD67E /* EPGCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */; };
 		606F00E420FEAF9F00DCD67E /* DataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00E120FEAF9F00DCD67E /* DataModel.m */; };
+		982C7123210264950065DE8A /* TimeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 982C7121210264940065DE8A /* TimeCell.m */; };
+		982C712621029AF90065DE8A /* TimeIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 982C712521029AF90065DE8A /* TimeIndicatorCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +63,10 @@
 		606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EPGCollectionViewLayout.m; sourceTree = "<group>"; };
 		606F00E020FEAF9F00DCD67E /* EPGCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EPGCollectionViewLayout.h; sourceTree = "<group>"; };
 		606F00E120FEAF9F00DCD67E /* DataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataModel.m; sourceTree = "<group>"; };
+		982C7121210264940065DE8A /* TimeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeCell.m; sourceTree = "<group>"; };
+		982C7122210264950065DE8A /* TimeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeCell.h; sourceTree = "<group>"; };
+		982C712421029AF90065DE8A /* TimeIndicatorCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimeIndicatorCell.h; sourceTree = "<group>"; };
+		982C712521029AF90065DE8A /* TimeIndicatorCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TimeIndicatorCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +118,8 @@
 			isa = PBXGroup;
 			children = (
 				606F00DD20FEAF9F00DCD67E /* DataModel.h */,
+				982C7122210264950065DE8A /* TimeCell.h */,
+				982C7121210264940065DE8A /* TimeCell.m */,
 				606F00E120FEAF9F00DCD67E /* DataModel.m */,
 				606F00DE20FEAF9F00DCD67E /* EPGCollectionViewCell.h */,
 				606F00DC20FEAF9F00DCD67E /* EPGCollectionViewCell.m */,
@@ -121,6 +129,8 @@
 				601833CF20FD717800F94150 /* AppDelegate.m */,
 				601833D120FD717800F94150 /* ViewController.h */,
 				601833D220FD717900F94150 /* ViewController.m */,
+				982C712421029AF90065DE8A /* TimeIndicatorCell.h */,
+				982C712521029AF90065DE8A /* TimeIndicatorCell.m */,
 				601833D420FD717900F94150 /* Main.storyboard */,
 				601833D720FD717A00F94150 /* Assets.xcassets */,
 				601833D920FD717A00F94150 /* LaunchScreen.storyboard */,
@@ -281,7 +291,9 @@
 				601833D320FD717900F94150 /* ViewController.m in Sources */,
 				606F00E320FEAF9F00DCD67E /* EPGCollectionViewLayout.m in Sources */,
 				601833DE20FD717A00F94150 /* main.m in Sources */,
+				982C712621029AF90065DE8A /* TimeIndicatorCell.m in Sources */,
 				606F00E220FEAF9F00DCD67E /* EPGCollectionViewCell.m in Sources */,
+				982C7123210264950065DE8A /* TimeCell.m in Sources */,
 				606F00E420FEAF9F00DCD67E /* DataModel.m in Sources */,
 				601833D020FD717800F94150 /* AppDelegate.m in Sources */,
 				6018340C20FE8AC900F94150 /* (null) in Sources */,

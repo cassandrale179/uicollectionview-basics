@@ -2,12 +2,14 @@
 #import "EPGCollectionViewCell.h"
 
 @implementation EPGCollectionViewCell
+CGFloat xPadding;
 
 - (instancetype)initWithFrame:(CGRect)frame
 {
+  xPadding = 10.;
   self = [super initWithFrame:frame];
   if (self) {
-    self.title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)];
+    self.title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 30)];
     self.title.textColor = [UIColor blackColor];
     self.title.textAlignment = NSTextAlignmentCenter;
     self.descriptionText = [[UILabel alloc]initWithFrame:CGRectMake(0, 30, 200, 30)];
@@ -24,22 +26,13 @@
 }
 
 -(void) setup: (NSString *) titleText withDescription:(NSString *)descriptionText {
-  //self.backgroundColor = [UIColor blueColor];
-  //NSLog(@"This is the width: %f", self.layer.frame.size.width);
-  //  self.title = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 30)];
-  //  self.title.textColor = [UIColor blackColor];
-  //  self.title.textAlignment = NSTextAlignmentCenter;
+  NSLog(@"This is the width: %f", self.layer.frame.size.width);
   self.layer.borderWidth = 2.0f;
   self.layer.borderColor = [UIColor blackColor].CGColor;
   self.title.text = titleText;
+  self.title.frame = CGRectMake(10, 10, self.layer.frame.size.width-(2*xPadding), 30);
+  self.descriptionText.frame = CGRectMake(10,50, self.layer.frame.size.width - (2*xPadding), 30);
   self.descriptionText.text = descriptionText;
-  //NSLog(@"This is the new x: %f with title: %@", self.frame.origin.x, self.title.text);
-  //[self.contentView addSubview:self.title];
-
-  // [self.title setFrame:CGRectMake(self.frame.origin.x, self.frame.origin.y,70,30)];
-
-
-  // self.description.text = descriptionText;
 }
 -(void) setThumbnailView:(UIImageView *)thumbnailView{
   self.thumbnailView.image = thumbnailView;

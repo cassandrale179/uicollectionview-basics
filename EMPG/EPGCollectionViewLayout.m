@@ -14,6 +14,7 @@ CGFloat firstTime = 0;//first time showing on the screen
 EPGRenderer *epg;
 CGFloat yPadding = 50;
 Boolean needSetup = true;
+NSString *timeIndicatorKind = @"TimeIndicatorView";
 
 // Constants for the hour header
 static const NSUInteger Hours = 3;                          // display show within next 7 hours
@@ -96,9 +97,13 @@ static const CGFloat ThumbnailSize = 0.5;
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
     if(CGRectIntersectsRect(rect, attributes.frame)){
       [attributesInRect addObject:attributes];
-
     }
   }
+  
+  //Supp view for time indicator cell
+  UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"TimeIndicatorView" atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
+  [attributesInRect addObject:attributes];
+  NSLog(@"This is the attrinrect %@", attributesInRect);
   return attributesInRect;
 }
 
@@ -114,6 +119,12 @@ static const CGFloat ThumbnailSize = 0.5;
     CGFloat widthPerHalfHour = availableWidth / Hours;
     attributes.frame = CGRectMake(ChannelHeaderWidth + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, HourHeaderHeight);
     // attributes.zIndex = -10;
+  }else if([kind isEqualToString:timeIndicatorKind]){
+    CGFloat cellStandardWidth = 400;
+    NSDate *timeAtFront = [NSDate date];
+    CGFloat currentTimeMarker = [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront]/(60*30.)*cellStandardWidth;
+    CGFloat topOfIndicator = 20;
+    attributes.frame = CGRectMake(currentTimeMarker, topOfIndicator, 2, contentSize.height);
   }
   return attributes;
 }
@@ -143,6 +154,7 @@ static const CGFloat ThumbnailSize = 0.5;
   }
   return indexPaths;
 }
+
 
 
 # pragma mark ----- HELPER METHODS ------

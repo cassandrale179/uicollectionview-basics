@@ -1,6 +1,7 @@
 #import "ViewController.h"
 #import "EPGCollectionViewCell.h"
 #import "TimeCell.h"
+#import "TimeIndicatorCell.h"
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
 
@@ -12,6 +13,8 @@
   NSArray *fakeDescrip;
   EPGRenderer *epg;
   NSString *timeCellIdentifier;
+  NSString *timeIndicatorIdentifier;
+  NSString *timeIndicatorKind;
 }
 - (void) createEPG;
 @end
@@ -24,13 +27,14 @@
 
 
   // Register class method
-
+  timeIndicatorKind = @"TimeIndicatorView";
   NSString *const HourHeaderView = @"HourHeaderView";
+  
   timeCellIdentifier = NSStringFromClass([TimeCell class]);
+  timeIndicatorIdentifier = NSStringFromClass([TimeCell class]);
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
 
   // Create an epg object
   [self createEPG];
@@ -45,12 +49,11 @@
   [collectionView registerClass:[TimeCell class]
      forSupplementaryViewOfKind: HourHeaderView
             withReuseIdentifier: timeCellIdentifier];
+  [collectionView registerClass:[TimeIndicatorCell class] forSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier];
   [collectionView setBackgroundColor:[UIColor whiteColor]];
   collectionView.directionalLockEnabled = true;
   [self.view addSubview:collectionView];
-  //time indicator layer
-  CAShapeLayer *currentTimeIndicator = [self drawCurrentTime];
-  [self.view.layer addSublayer:currentTimeIndicator];
+  
 }
 
 #pragma mark --------- HEADER METHOD ---------
@@ -91,35 +94,20 @@ referenceSizeForHeaderInSection:(NSInteger)section {
   return cell;
 }
 
+
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath{
-  TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: @"HourHeaderView" withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
-  return timeCell;
+  UICollectionReusableView *cell;
+  if([kind isEqualToString:@"HourHeaderView"]){
+    cell = [collectionView dequeueReusableSupplementaryViewOfKind: @"HourHeaderView" withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
+  }else if([kind isEqualToString:timeIndicatorKind]){
+    cell = [collectionView dequeueReusableSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier forIndexPath:indexPath];
+  }
+  return cell;
 }
 
 // Dispose of any resources that can be recreated.
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
-}
-
-#pragma mark --------- TimeIndicatorLine ---------
-
--(CAShapeLayer *) drawCurrentTime{
-  UIBezierPath *path = [UIBezierPath bezierPath];
-  NSDate *timeAtFront = [NSDate date];
-
-  // will in future replace [timeAtFront dateByAddingTimeInterval:1500] w [NSDate date] for currentTime
-  // divide by seconds*timeIntervalInMinutes
-  CGFloat cellStandardWidth = 400;
-  CGFloat currentTimeMarker = [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront]/(60*30.)*cellStandardWidth;
-  CGFloat topOfIndicator = 20;
-  [path moveToPoint:CGPointMake(currentTimeMarker, topOfIndicator)];
-  [path addLineToPoint:CGPointMake(currentTimeMarker, self.view.layer.frame.size.height)];
-  CAShapeLayer *shapeLayer = [CAShapeLayer layer];
-  shapeLayer.path = [path CGPath];
-  shapeLayer.strokeColor = [[UIColor redColor] CGColor];
-  shapeLayer.lineWidth = 3.0;
-  shapeLayer.fillColor = [[UIColor clearColor] CGColor];
-  return shapeLayer;
 }
 
 #pragma mark --------- CREATE THE EPG ---------
