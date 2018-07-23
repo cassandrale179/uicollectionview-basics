@@ -102,7 +102,15 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   NSLog(@"array count for hour %ld", [hourHeaderViewIndexPaths count]);
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
-    
+    [attributesInRect addObject:attributes];
+  }
+  
+
+  // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
+  NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViewsInRect:rect];
+  NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
+  for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
+    UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
     // Make the network header scrolling pin to the left when scrolling horizontally
     CGPoint const contentOffset = self.collectionView.contentOffset;
     if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
@@ -114,15 +122,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
         .size = attributes.frame.size
       };
     }
-    [attributesInRect addObject:attributes];
-  }
-  
-
-  // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
-  NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViewsInRect:rect];
-  NSLog(@"array count for channel %ld", [channelHeaderIndexPaths count]);
-  for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
-    UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
     [attributesInRect addObject:attributes];
   }
   
