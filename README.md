@@ -102,4 +102,8 @@ C. Implement a method to initialize / create an EPG object:
 }
 ```
 
+
+### 2. Create a layout for UI Collection View
+
+
    
