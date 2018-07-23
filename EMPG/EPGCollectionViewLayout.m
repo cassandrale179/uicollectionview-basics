@@ -227,7 +227,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
 - (void) createEPG{
   // Timestamp generator;
-  int timestamp = [[NSDate date] timeIntervalSince1970];
   int from = 900;
   int to = 7200;
 
@@ -265,8 +264,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
     for (int j = 0; j < [dummyTitle count]; j++){
       AiringRenderer *airing = [[AiringRenderer alloc] init];
       airing.airingTitle = dummyTitle[j];
-
-      NSLocale* currentLocale = [NSLocale currentLocale];
       airing.airingStartTime = [NSDate date];
       airing.airingEndTime = [NSDate dateWithTimeInterval:(arc4random() % (to-from+1)) sinceDate:airing.airingStartTime];
 
