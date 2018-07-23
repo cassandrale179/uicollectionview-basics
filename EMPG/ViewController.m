@@ -171,7 +171,7 @@ referenceSizeForHeaderInSection:(NSInteger)section {
   NSArray *allTitles = [NSArray arrayWithObjects: d1, d2, d3, d4, d5,d6, d7, d8, d9, d10, nil];
 
 
-  // Create an array of stations for one epg s
+  // Create an array of stations for one epg
   for (int i = 0; i < [stationTitle count]; i++){
 
     StationRenderer *station = [[StationRenderer alloc] init];
@@ -184,7 +184,6 @@ referenceSizeForHeaderInSection:(NSInteger)section {
     for (int j = 0; j < [dummyTitle count]; j++){
       AiringRenderer *airing = [[AiringRenderer alloc] init];
       airing.airingTitle = dummyTitle[j];
-      NSLocale* currentLocale = [NSLocale currentLocale];
       airing.airingStartTime = [NSDate date];
       airing.airingEndTime = [NSDate dateWithTimeInterval:arc4random() % (to-from+1) sinceDate:airing.airingStartTime];
       [station.airings addObject:airing];
