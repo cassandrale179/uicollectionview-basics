@@ -196,9 +196,9 @@ if ([kind isEqualToString:@"HourHeaderView"]) {
 ```
 
 #### E. Add the supplementary view in the View Controller 
-- Create some constants: 
+- Create some constants in which the view kind is what specified in the EPGCollectionViewLayOut.m and the identifier is the name of the class we have created (e.g TimeCell.h): 
 ```objective-c
-timeIndicatorKind = @"TimeIndicatorView";
+timeCellIdentifier = NSStringFromClass([TimeCell class]);
 timeCellKind = @"HourHeaderView"; 
 ```
 
