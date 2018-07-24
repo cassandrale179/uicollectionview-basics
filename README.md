@@ -10,13 +10,14 @@ This is a log for future documentation purpose.
 - C. Method to create an EPG object <br>
 
 **2. Creating UICollectionView** <br>
-- A. Create the cell for the collectionview (Emily) <br>
-- B. Create the flow layout for the collection view (Emily) <br>
-- C. Add the cell and flow layout to the view controller (Emily) <br>
-- D. Create supplementary view for the time and station cell (Minh) <br>
-- E. Add supplementary view to the view controller (Minh) <br>
-- F. Create supplementary view for the time indicator line (Emily) <br> 
-
+- A. Create the cell for the collectionview  <br>
+- B. Create the flow layout for the collection view  <br>
+- C. Add the cell and flow layout to the view controller  <br>
+- D. Create supplementary view for the time and station cell  <br>
+- E. Add supplementary view to the view controller  <br>
+- F. Create supplementary view for the time indicator line  <br> 
+- G. Making the CollectionView Scrollable in both directions  <br>
+- H. Making the video thumbnail cell  <br> 
 
 
 ## Steps By Steps Instruction 
@@ -123,6 +124,61 @@ We create a double for loop to fill the content of the station cell, then put ea
 
 
 ### 2. Create An UICollectionView
+#### A. Create the cell for the collectionview
+**1. Create the actual custom Cell class **:
+The basis of the UICollectionView will be the airing cells that show the various different showings playing at different times. 
+To create the basis of these custom cells, first create a separate class inheriting from UICollectionViewCell. This is the class that will include the 
+basic frame design for each airing cell with regards to background color, border width, text (title and description) etc. 
+To be able to use the cell within the collectionView, in the ViewController, these the custom cell must be registered as a custom cell
+```objective-c
+[collectionView registerClass:[EPGCollectionViewCell class] forCellWithReuseIdentifier:@"epgCell"];
+```
+The cell identifier will be used later when the collectionView is trying to find what kind of cell it needs to display with the cellForItemAtIndexPath method.
+**2. Use the custom Cell class in your CollectionView**:
+To actually ensure that the custom cell is being displayed in the collectionView, the cellForItemAtIndexPath: method needs to call on the custom cell we just made:
+```objective-c
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+  EPGCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"epgCell" forIndexPath:indexPath];
+  return cell;
+}
+```
+The cell identifier must match the identifier used to register the cells above in the viewDidLoad method for the viewcontroller. 
+**3. Customize each cell content **:
+Since the ViewController the CollectionView is implemented in also inherits from the UICollectionViewDataSource, this is also the file where 
+any content that needs to be added to the collectionView cells needs to be added.
+```objective-c
+[cell setup:epg.stations[indexPath.section].airings[indexPath.item-1].airingTitle withDescription:@"sampledescription"];
+```
+For organization purposes, a setup method was created in the custom Cell class that will take in the title and description text to 
+modify each individual cell.
+
+#### B. Create the flow layout for the collection view
+**1. Show Cells on the Screen
+In conjunction with the setting up of the bounds in prepareLayout (detailed in the scrollable section below), display only items that are currently on the visible screen frame. 
+```objective-c
+for(NSIndexPath *indexPath in cellAttrDict){
+    UICollectionViewLayoutAttributes *attributes = [cellAttrDict objectForKey:indexPath];
+    if(CGRectIntersectsRect(rect, attributes.frame)){
+      [attributesInRect addObject:attributes];
+    }
+  }
+```
+**2. Inform the CollectionViewLayout what cells are at the current IndexPath
+```objective-c
+- (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath{
+  return [cellAttrDict objectForKey:indexPath];
+}
+```
+#### C. Add the flow layout to the view controller (Emily) <br>
+When the View first loads, create the custom ViewLayout Instance
+```objective-c
+ EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
+ ```
+Connect it as the custom layout to the CollectionView
+```objective-c
+  collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
+```
+
 #### D. Create supplementary view for the time and station cell  
 There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
 - For station cell (StationCell.h) and time cell (TimeCell.h) create a class and method files associated with it 
@@ -220,13 +276,140 @@ timeCellKind = @"HourHeaderView";
     return timeCell;
   }
  ```
+#### F. Create supplementary view for the time indicator line (Emily)
+**1. Create a custom TimeIndicator Class 
+This supplementary view will be inheriting from the UICollectionReusableView as a supplementary view that moves with the collectionView. 
+Since we want the time Indicator to be a line of the current time, it is essentially going to be a 2px wide cell that is red.
+``` objective-c
+- (instancetype)initWithFrame:(CGRect)frame
+{
+  self = [super initWithFrame:frame];
+  if (self) {
+    self.backgroundColor = [UIColor redColor];
+  }
+  return self;
+}
+```
+**2. Specify Attributes for Time Indicator Cell(Line) in the Layouts
+The size of the 2px wide cell will be specified as an attribute in the ViewLayouts layoutAttributesforSupplementaryViewOfKind. To determine the x-position of the current Time Indicator Line:
+- let timeAtFront be the most recent time in a set time interval that the tv guide shows
+- distance of the currentTimeIndicatorLine will be proportional to the length of time between the current time and the timeAtFront
+- multiply by a standard cell width(ex. if the set time interval is 30 min, then maybe the standard cell width for 30 min is 400px) to get the relative x position of the timeIndicatorLine on the collectionView
+To make this line span the entire collectionView across all of the channels, let its starting y be near the top of the screen and the ending y position be at the bottom of the collectionView
+```objective-c
+else if([kind isEqualToString:timeIndicatorKind]){
+    CGFloat cellStandardWidth = 400;
+    NSDate *timeAtFront = [NSDate date];
+    CGFloat currentTimeMarker = [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront]/(60*30.)*cellStandardWidth;
+    CGFloat topOfIndicator = 20;
+    attributes.frame = CGRectMake(currentTimeMarker, topOfIndicator, 2, contentSize.height);
+  }
+```
+**3. Register the TimeIndicatorCell Line in the ViewController
+```objective-c
+[collectionView registerClass:[TimeIndicatorCell class]
+     forSupplementaryViewOfKind:timeIndicatorKind
+            withReuseIdentifier:timeIndicatorIdentifier];
+```
+** 4. Ensure it is called properly in the viewForSupplementaryElementOfKind method
+```
+objective-c
+else if([kind isEqualToString:timeIndicatorKind]){
+    TimeIndicatorCell *timeIndicatorCell = [collectionView dequeueReusableSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier forIndexPath:indexPath];
+    return timeIndicatorCell;
+  }
+```
+#### G. Making the CollectionView Scrollable in both directions (Emily)
+**1. In the CollectionViewLayout prepareLayout method calculate the frame of each cell
+```objective-c
+for(int section = 0; section<self.collectionView.numberOfSections; section++){
+      if([self.collectionView numberOfItemsInSection:section] > 0){
+        CGFloat xPos = ChannelHeaderWidth;
+        CGFloat yPos = yPadding+section*CELL_HEIGHT+borderPadding*section;
 
+        // Calculate the frame of each airing
+        for (int item = 0; item<[self.collectionView numberOfItemsInSection:section]; item++){
+          NSIndexPath *cellIndex = [NSIndexPath indexPathForItem:item inSection:section];
+          CGFloat multFactor;
+          UICollectionViewLayoutAttributes *attr;
 
+          
+            multFactor= [epg.stations[section].airings[item-1].airingEndTime timeIntervalSinceDate:epg.stations[section].airings[item-1].airingStartTime]/(timeInterval * 60.);
+            attr = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
+         
+          attr.frame = CGRectMake(xPos, yPos, multFactor*CELL_WIDTH, CELL_HEIGHT);
+          xPos += multFactor*CELL_WIDTH;
+          [cellAttrDict setValue:attr forKey:cellIndex];
+        }
+        xMax = MAX(xMax, xPos);
+      }
 
+```
+**2. Set the content size of the CollectionView
+By making the contentSize of the CollectionView equal to the height and width of the entire collectionview, I'm able to allow the collectionview to be scrolled in both directions vs just one direction (because the collectionview width and height are bigger than the visible screen width and height respectively). Add the following to the end of the prepareLayout method after creating the frame for each cell.
+```objective-c
+CGFloat contentWidth = xMax;
+      CGFloat contentHeight = [self.collectionView numberOfSections]*(CELL_HEIGHT+borderPadding)+yPadding;
+      contentSize = CGSizeMake(contentWidth, contentHeight);
+```
+Return the larger contentSize we calculated to override the collectionViewContentSize
+```objective-c
+- (CGSize)collectionViewContentSize{
+  return contentSize;
+}
+```
+** 3. Force the prepareLayout method to be called for each screen rotation
+Recalculate the bounds of the attribute frames for each cell depending on the new screen orientation. 
+```objective-c
+- (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds{
+  return YES;
+}
+```
+Returning yes to this method ensures that prepareLayout will be called everytime the device is rotated
+** 4. Enable scrolling only in ONE direction AT A TIME
+Set bidirectionallock to true to ensure that the collectionview can only be scrolled vertically OR horizontally (so that the view can't be scrolled diagonally)
+``` objective-c
+collectionView.directionalLockEnabled = true;
+```
+#### H. Making the video thumbnail cell
+**1. Modify the Attribute Frame of each cell to accommodate the video cell
+Since the video cell will always be the first cell column in the TV guide, allocate a space for the video cell in prepareLayout -- when creating the bounds for all the airing cells -- everytime the indexpath.item is 0. 
+```objective-c
+for (int item = 0; item<[self.collectionView numberOfItemsInSection:section]; item++){
+          NSIndexPath *cellIndex = [NSIndexPath indexPathForItem:item inSection:section];
+          CGFloat multFactor;
+          UICollectionViewLayoutAttributes *attr;
 
+          // If the cell is not a thumbnail
+          if(item!=0){
+            multFactor= [epg.stations[section].airings[item-1].airingEndTime timeIntervalSinceDate:epg.stations[section].airings[item-1].airingStartTime]/(timeInterval * 60.);
+            attr = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
+          }else{
+            //some random constant for the size of the thumbnail
+            multFactor = ThumbnailSize;
+            attr = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
+          }
 
+          attr.frame = CGRectMake(xPos, yPos, multFactor*CELL_WIDTH, CELL_HEIGHT);
+          xPos += multFactor*CELL_WIDTH;
+          [cellAttrDict setValue:attr forKey:cellIndex];
+        }
+        xMax = MAX(xMax, xPos);
+      }
+ ```
+ ** 2. Modify the cellForIndexAtItemPath in the ViewController to accommodate the video cell 
+ The video cell will always be at indexpath.item==0
 
+ ```objective-c
+ - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
+  EPGCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"epgCell" forIndexPath:indexPath];
 
-
-
-   
+  //set the content of each cell
+  if(indexPath.item!=0){
+    [cell setup:epg.stations[indexPath.section].airings[indexPath.item-1].airingTitle withDescription:@"sampledescription"];
+  }else{
+    [cell setup:@"video" withDescription:@"sampledescription"];
+  }
+  return cell;
+}
+```
