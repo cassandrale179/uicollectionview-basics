@@ -124,7 +124,7 @@ We create a double for loop to fill the content of the station cell, then put ea
 
 ### 2. Create An UICollectionView
 #### D. Create supplementary view for the time and station cell  
-**1. Create cusotm time and station cell files**: 
+**1. Create cusotm time and station cell files**: <br> 
 There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
 - For station cell (StationCell.h) and time cell (TimeCell.h) create a class and method files associated with it 
 - E.g, implementation for the station cell: 
@@ -144,7 +144,58 @@ if (self) {
 }
 ``` 
 
-**2. Modify the**
+**2. Modify the flow layout to cusotmize the cell (EPGCollectionViewLayout.m):** <br>
+- Create the index path for the station / time cell (e.g in this case, we are creating 9 cells for time): 
+```objective-c
+- (NSArray *)indexPathsOfHourHeaderViewsInRect:(CGRect)rect
+{
+  NSInteger minHourIndex = 0;
+  NSInteger maxHourIndex = 9;
+  NSMutableArray *indexPaths = [NSMutableArray array];
+  for (NSInteger idx = minHourIndex; idx <= maxHourIndex; idx++) {
+    NSIndexPath *indexPath = [NSIndexPath indexPathForItem:idx inSection:0];
+    [indexPaths addObject:indexPath];
+  }
+  return indexPaths;
+}
+```
+
+- Draw the coordinate and position of each cell: <br> 
+For the hour cell, we want the left boundary of the entire cell header to start after the thumbnail, so the frame will be first shift by the width of the station cell column, then the thumbnail cell size (paddingSize). The y coordinate is 0 because we want the cell header to be at the top. 
+
+```objective-c
+if ([kind isEqualToString:@"HourHeaderView"]) {
+    CGFloat widthPerHalfHour = CELL_WIDTH;
+    CGFloat paddingSize = ThumbnailSize*CELL_WIDTH;
+    attributes.frame = CGRectMake(ChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, HourHeaderHeight);
+  }
+```
+
+
+- Within the method layoutAttributesForElementsInRect, create 2 supplementary views for time/station: 
+```objective-c
+  NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViewsInRect:rect];
+  for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
+    UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
+    [attributesInRect addObject:attributes];
+  }
+``` 
+
+
+- For station cell, we want to make it stick to the left when we are scrolling horizontally:
+```
+    CGPoint const contentOffset = self.collectionView.contentOffset;
+    if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
+      CGPoint origin = attributes.frame.origin;
+      origin.x = contentOffset.x;       // change the x-coordinate of the cell to the x-coordinnate of the view 
+      attributes.zIndex = 1024;
+      attributes.frame = (CGRect){
+        .origin = origin,
+        .size = attributes.frame.size
+      };
+    }
+```
+
 
 
 
