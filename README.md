@@ -124,7 +124,6 @@ We create a double for loop to fill the content of the station cell, then put ea
 
 ### 2. Create An UICollectionView
 #### D. Create supplementary view for the time and station cell  
-**1. Create cusotm time and station cell files**: <br> 
 There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
 - For station cell (StationCell.h) and time cell (TimeCell.h) create a class and method files associated with it 
 - E.g, implementation for the station cell: 
@@ -144,7 +143,7 @@ if (self) {
 }
 ``` 
 
-**2. Modify the flow layout to cusotmize the cell (EPGCollectionViewLayout.m):** <br>
+**Modify the flow layout to cusotmize the cell (EPGCollectionViewLayout.m):** <br>
 - Create the index path for the station / time cell (e.g in this case, we are creating 9 cells for time): 
 ```objective-c
 - (NSArray *)indexPathsOfHourHeaderViewsInRect:(CGRect)rect
@@ -197,9 +196,30 @@ if ([kind isEqualToString:@"HourHeaderView"]) {
 ```
 
 #### E. Add the supplementary view in the View Controller 
+- Create some constants: 
+```objective-c
+timeIndicatorKind = @"TimeIndicatorView";
+timeCellKind = @"HourHeaderView"; 
+```
 
-
-
+ - Register the class for the cell:
+ ``` objective-c
+ [collectionView registerClass:[TimeCell class] forSupplementaryViewOfKind: timeCellKind
+           withReuseIdentifier: timeCellIdentifier];
+  ``` 
+  
+  - Implement dequeue method:
+  ``` objective-c
+  - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+           viewForSupplementaryElementOfKind:(NSString *)kind
+                                 atIndexPath:(NSIndexPath *)indexPath{
+      if ([kind isEqualToString:timeCellKind]){
+    TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: timeCellKind
+      withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
+    [timeCell setup: [NSString stringWithFormat:@"%ld:00 PM", indexPath.item]];
+    return timeCell;
+  }
+ ```
 
 
 
