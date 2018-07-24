@@ -133,7 +133,6 @@ We create a double for loop to fill the content of the station cell, then put ea
 ```objective-c
 [collectionView registerClass:[EPGCollectionViewCell class] forCellWithReuseIdentifier:@"epgCell"];
 ```
-
 **2. Use the custom Cell class in your CollectionView**:
 - CollectionView uses cell identifier to find cell type to display using cellForItemAtIndexPath method. 
 - CellForItemAtIndexPath: returns the visible cell object at the specified index path. 
@@ -144,14 +143,12 @@ We create a double for loop to fill the content of the station cell, then put ea
   return cell;
 }
 ```
-
 **3. Customize each cell content**:
 - ViewController inherits from the UICollectionViewDataSource, so add any content for collectionView cells here. 
 - Setup method in custom cell class will take in the title and description text to modify each individual cell. 
 ```objective-c
 [cell setup:epg.stations[indexPath.section].airings[indexPath.item-1].airingTitle withDescription:@"sampledescription"];
 ```
-
 #### B. Create the flow layout for the collection view
 **1. Show Cells on the Screen** 
 In conjunction with the setting up of the bounds in prepareLayout (detailed in the scrollable section below), display only items that are currently on the visible screen frame. 
@@ -175,7 +172,6 @@ When the View first loads, create the custom ViewLayout Instance and connect it 
  EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
 ```
-
 #### D. Create supplementary view for the time and station cell  
 There will be 3 types of cell (the airing cell, the time cell, and the station cell) 
 - For station cell (StationCell.h) and time cell (TimeCell.h) create a class and method files associated with it 
@@ -273,10 +269,10 @@ timeCellKind = @"HourHeaderView";
     return timeCell;
   }
  ```
-#### F. Create supplementary view for the time indicator line  
+#### F. Create supplementary view for the Time Indicator line  
 **1. Create a custom TimeIndicator Class**  
-- This supplementary view inherit UICollectionReusableView and moves with the collectionView. 
-- It is a 2px wide cell that is red.
+- This supplementary view will inherit from UICollectionReusableView and scroll with the collectionView (airing cells). 
+- It is one 2px wide cell that is red (the size will be allocated in the ViewLayout as the attribute frame).
 ``` objective-c
 - (instancetype)initWithFrame:(CGRect)frame
 {
@@ -290,10 +286,10 @@ timeCellKind = @"HourHeaderView";
 **2. Specify Attributes for Time Indicator Cell(Line) in the Layouts** 
 - The size of the 2px wide cell will be specified as an attribute in the ViewLayouts layoutAttributesforSupplementaryViewOfKind. 
 - To determine the x-position of the current Time Indicator Line:
-  - Let timeAtFront be the most recent time in a set time interval that the tv guide shows
+  - Let timeAtFront = the most recent time in a set time interval that the tv guide shows
   - Distance of the currentTimeIndicatorLine will be proportional to the length of time between the current time and the timeAtFront
    - Multiply by a standard cell width (ex. if time interval is 30 min, then standard cell width is 400px) to get the relative x position of the timeIndicatorLine on the collectionView
-   - To span the line across collectionView across all of the channels, let its starting y be top of screen and ending y at bottom of collectionView. 
+   - To span the line across collectionView across all of the channels: let its starting y-position be the top of the screen and ending y-position be at the bottom of the collectionView. 
 ```objective-c
 else if([kind isEqualToString:timeIndicatorKind]){
     CGFloat cellStandardWidth = 400;
@@ -309,7 +305,7 @@ else if([kind isEqualToString:timeIndicatorKind]){
      forSupplementaryViewOfKind:timeIndicatorKind
             withReuseIdentifier:timeIndicatorIdentifier];
 ```
-**4. Ensure it is called properly in the viewForSupplementaryElementOfKind method** 
+**4. Ensure it is properly called in the viewForSupplementaryElementOfKind method** 
 ```objective-c
 else if([kind isEqualToString:timeIndicatorKind]){
     TimeIndicatorCell *timeIndicatorCell = [collectionView dequeueReusableSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier forIndexPath:indexPath];
@@ -343,13 +339,16 @@ for(int section = 0; section<self.collectionView.numberOfSections; section++){
 
 ```
 **2. Set the content size of the CollectionView**
-- Make contentSize of CollectionView equal to height and width of entire collectionView
-- This enable scrolling in both direction (Collectionview width and height are bigger than the visible screen width and height)
-- Add this at end of prepareLayout method and return content size: 
+- Make the contentSize of the CollectionView equal to the height and width of entire collectionView
+- This enables scrolling in both direction since the CollectionView's width and height are bigger than the visible screen's  width and height respectively
+- Modify the contentSize at the end of the prepareLayout method: 
 ```objective-c
 CGFloat contentWidth = xMax;
       CGFloat contentHeight = [self.collectionView numberOfSections]*(CELL_HEIGHT+borderPadding)+yPadding;
       contentSize = CGSizeMake(contentWidth, contentHeight);
+```
+- Return the calculated content size in the collectionViewContentSize method in viewLayout:
+```objective-c
  - (CGSize)collectionViewContentSize{
   return contentSize;
 } 
@@ -364,7 +363,7 @@ CGFloat contentWidth = xMax;
 ```
 
 **4. Enable scrolling only in ONE direction AT A TIME**: 
-Set bidirectionallock to true to so that the view can't be scrolled diagonally: 
+Set bidirectionallock in the viewcontroller to true to so that the view can't be scrolled diagonally: 
 ``` objective-c
 collectionView.directionalLockEnabled = true;
 ```
