@@ -183,7 +183,7 @@ if ([kind isEqualToString:@"HourHeaderView"]) {
 
 
 - For station cell, we want to make it stick to the left when we are scrolling horizontally:
-```
+```objective-c
     CGPoint const contentOffset = self.collectionView.contentOffset;
     if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
       CGPoint origin = attributes.frame.origin;
@@ -195,6 +195,11 @@ if ([kind isEqualToString:@"HourHeaderView"]) {
       };
     }
 ```
+
+#### E. Add the supplementary view in the View Controller 
+
+
+
 
 
 
