@@ -407,3 +407,7 @@ for (int item = 0; item<[self.collectionView numberOfItemsInSection:section]; it
   return cell;
 }
 ```
+
+
+## Resources
+- **Create an UI Collection View**: https://www.objc.io/issues/3-views/collection-view-layouts/
