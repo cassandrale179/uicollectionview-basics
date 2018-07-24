@@ -169,13 +169,10 @@ for(NSIndexPath *indexPath in cellAttrDict){
   return [cellAttrDict objectForKey:indexPath];
 }
 ```
-#### C. Add the flow layout to the view controller (Emily) <br>
-When the View first loads, create the custom ViewLayout Instance
+#### C. Add the flow layout to the view controller <br>
+When the View first loads, create the custom ViewLayout Instance and connect it to CollectionView: 
 ```objective-c
  EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
- ```
-Connect it as the custom layout to the CollectionView
-```objective-c
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
 ```
 
