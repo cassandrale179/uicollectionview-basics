@@ -276,7 +276,7 @@ timeCellKind = @"HourHeaderView";
     return timeCell;
   }
  ```
-#### F. Create supplementary view for the time indicator line (Emily)
+#### F. Create supplementary view for the time indicator line  
 **1. Create a custom TimeIndicator Class**  
 - This supplementary view inherit UICollectionReusableView and moves with the collectionView. 
 - It is a 2px wide cell that is red.
@@ -295,8 +295,8 @@ timeCellKind = @"HourHeaderView";
 - To determine the x-position of the current Time Indicator Line:
   - Let timeAtFront be the most recent time in a set time interval that the tv guide shows
   - Distance of the currentTimeIndicatorLine will be proportional to the length of time between the current time and the timeAtFront
-   - Multiply by a standard cell width (ex. if the set time interval is 30 min, then maybe the standard cell width for 30 min is 400px) to get the relative x position of the timeIndicatorLine on the collectionView
-   - To make this line span the entire collectionView across all of the channels, let its starting y be near the top of the screen and the ending y position be at the bottom of the collectionView
+   - Multiply by a standard cell width (ex. if time interval is 30 min, then standard cell width is 400px) to get the relative x position of the timeIndicatorLine on the collectionView
+   - To span the line across collectionView across all of the channels, let its starting y be top of screen and ending y at bottom of collectionView. 
 ```objective-c
 else if([kind isEqualToString:timeIndicatorKind]){
     CGFloat cellStandardWidth = 400;
@@ -313,8 +313,7 @@ else if([kind isEqualToString:timeIndicatorKind]){
             withReuseIdentifier:timeIndicatorIdentifier];
 ```
 **4. Ensure it is called properly in the viewForSupplementaryElementOfKind method** 
-```
-objective-c
+```objective-c
 else if([kind isEqualToString:timeIndicatorKind]){
     TimeIndicatorCell *timeIndicatorCell = [collectionView dequeueReusableSupplementaryViewOfKind:timeIndicatorKind withReuseIdentifier:timeIndicatorIdentifier forIndexPath:indexPath];
     return timeIndicatorCell;
@@ -346,35 +345,35 @@ for(int section = 0; section<self.collectionView.numberOfSections; section++){
       }
 
 ```
-**2. Set the content size of the CollectionView** 
-By making the contentSize of the CollectionView equal to the height and width of the entire collectionview, I'm able to allow the collectionview to be scrolled in both directions vs just one direction (because the collectionview width and height are bigger than the visible screen width and height respectively). Add the following to the end of the prepareLayout method after creating the frame for each cell.
+**2. Set the content size of the CollectionView**
+- Make contentSize of CollectionView equal to height and width of entire collectionView
+- This enable scrolling in both direction (Collectionview width and height are bigger than the visible screen width and height)
+- Add this at end of prepareLayout method and return content size: 
 ```objective-c
 CGFloat contentWidth = xMax;
       CGFloat contentHeight = [self.collectionView numberOfSections]*(CELL_HEIGHT+borderPadding)+yPadding;
       contentSize = CGSizeMake(contentWidth, contentHeight);
-```
-Return the larger contentSize we calculated to override the collectionViewContentSize
-```objective-c
-- (CGSize)collectionViewContentSize{
+ - (CGSize)collectionViewContentSize{
   return contentSize;
-}
+} 
 ```
-** 3. Force the prepareLayout method to be called for each screen rotation
-Recalculate the bounds of the attribute frames for each cell depending on the new screen orientation. 
+**3. Force the prepareLayout method to be called for each screen rotation** 
+- Recalculate the bounds of the attribute frames for each cell depending on the new screen orientation. 
+- Returning yes to this method ensures that prepareLayout will be called everytime the device is rotated
 ```objective-c
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds{
   return YES;
 }
 ```
-Returning yes to this method ensures that prepareLayout will be called everytime the device is rotated
-** 4. Enable scrolling only in ONE direction AT A TIME
-Set bidirectionallock to true to ensure that the collectionview can only be scrolled vertically OR horizontally (so that the view can't be scrolled diagonally)
+
+**4. Enable scrolling only in ONE direction AT A TIME**: 
+Set bidirectionallock to true to so that the view can't be scrolled diagonally: 
 ``` objective-c
 collectionView.directionalLockEnabled = true;
 ```
 #### H. Making the video thumbnail cell
-**1. Modify the Attribute Frame of each cell to accommodate the video cell
-Since the video cell will always be the first cell column in the TV guide, allocate a space for the video cell in prepareLayout -- when creating the bounds for all the airing cells -- everytime the indexpath.item is 0. 
+**1. Modify the Attribute Frame of each cell to accommodate the video cell**: 
+- Since the video cell will always be the first cell column in the TV guide, allocate a space for the video cell in prepareLayout -- when creating the bounds for all the airing cells -- everytime the indexpath.item is 0. 
 ```objective-c
 for (int item = 0; item<[self.collectionView numberOfItemsInSection:section]; item++){
           NSIndexPath *cellIndex = [NSIndexPath indexPathForItem:item inSection:section];
@@ -398,8 +397,8 @@ for (int item = 0; item<[self.collectionView numberOfItemsInSection:section]; it
         xMax = MAX(xMax, xPos);
       }
  ```
- ** 2. Modify the cellForIndexAtItemPath in the ViewController to accommodate the video cell 
- The video cell will always be at indexpath.item==0
+ **2. Modify the cellForIndexAtItemPath in the ViewController to accommodate the video cell** 
+ - The video cell will always be at indexpath.item==0
 
  ```objective-c
  - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
