@@ -125,35 +125,35 @@ We create a double for loop to fill the content of the station cell, then put ea
 
 ### 2. Create An UICollectionView
 #### A. Create the cell for the collectionview
-**1. Create the actual custom Cell class **:
-The basis of the UICollectionView will be the airing cells that show the various different showings playing at different times. 
-To create the basis of these custom cells, first create a separate class inheriting from UICollectionViewCell. This is the class that will include the 
-basic frame design for each airing cell with regards to background color, border width, text (title and description) etc. 
-To be able to use the cell within the collectionView, in the ViewController, these the custom cell must be registered as a custom cell
+**1. Create the actual custom Cell class**:
+- Airing cells display different showings playing at different times. <br> 
+- To create custom cells, first create a separate class inheriting from UICollectionViewCell. 
+- This class includes the  basic frame design for each airing cell with regards to background color, border width, text (title and description) etc. 
+- To use this cell within the collectionView, in the ViewController, registered it as a custom cell
 ```objective-c
 [collectionView registerClass:[EPGCollectionViewCell class] forCellWithReuseIdentifier:@"epgCell"];
 ```
-The cell identifier will be used later when the collectionView is trying to find what kind of cell it needs to display with the cellForItemAtIndexPath method.
+
 **2. Use the custom Cell class in your CollectionView**:
-To actually ensure that the custom cell is being displayed in the collectionView, the cellForItemAtIndexPath: method needs to call on the custom cell we just made:
+- CollectionView uses cell identifier to find cell type to display using cellForItemAtIndexPath method. 
+- CellForItemAtIndexPath: returns the visible cell object at the specified index path. 
 ```objective-c
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
   EPGCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"epgCell" forIndexPath:indexPath];
   return cell;
 }
 ```
-The cell identifier must match the identifier used to register the cells above in the viewDidLoad method for the viewcontroller. 
-**3. Customize each cell content **:
-Since the ViewController the CollectionView is implemented in also inherits from the UICollectionViewDataSource, this is also the file where 
-any content that needs to be added to the collectionView cells needs to be added.
+- The cell identifier must match identifier used for register in viewDidLoad (ViewController) 
+
+**3. Customize each cell content**:
+- ViewController inherits from the UICollectionViewDataSource, so any content that needs to be added to the collectionView cells locate here. 
 ```objective-c
 [cell setup:epg.stations[indexPath.section].airings[indexPath.item-1].airingTitle withDescription:@"sampledescription"];
 ```
-For organization purposes, a setup method was created in the custom Cell class that will take in the title and description text to 
-modify each individual cell.
+- Setup method in custom cell class will take in the title and description text to modify each individual cell.
 
 #### B. Create the flow layout for the collection view
-**1. Show Cells on the Screen
+**1. Show Cells on the Screen** 
 In conjunction with the setting up of the bounds in prepareLayout (detailed in the scrollable section below), display only items that are currently on the visible screen frame. 
 ```objective-c
 for(NSIndexPath *indexPath in cellAttrDict){
