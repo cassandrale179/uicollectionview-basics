@@ -50,30 +50,28 @@ This is a log for future documentation purpose.
 #### B. The creationg of an EPG object (DataModel.h) files:    
    
  ```objective-c
-// Each airing object is a TV show / movie 
-
 @interface AiringRenderer : NSObject
-@property (nonatomic, readwrite) NSString *airingTitle;;
-@property (nonatomic, readwrite) NSDate *airingStartTime;
-@property (nonatomic, readwrite) NSDate *airingEndTime;
-@property (nonatomic, readwrite) NSString *airingDescription;
+@property (nonatomic) NSString *airingTitle;;
+@property (nonatomic) NSDate *airingStartTime;
+@property (nonatomic) NSDate *airingEndTime;
 @end
 
 
-// Each station contain an array of airings 
+// For each station, create a list of airings
 @interface StationRenderer : NSObject
-@property (nonatomic, readwrite) NSMutableArray <AiringRenderer*> *airings;
-@property (nonatomic, readwrite) NSString* stationName;
-@property (nonatomic, readwrite) UIImage* stationLogo;
+@property (nonatomic) NSMutableArray <AiringRenderer*> *airings;
+@property (nonatomic) NSString *stationName;
+@property (nonatomic) UIImage *networkLogo;
 @end
 
 
-// Each epg object contain an array of stations 
+// Create a list of stations
 @interface EPGRenderer : NSObject
-@property (nonatomic, readwrite) NSMutableArray<StationRenderer *> *stations;
-@property (nonatomic, readwrite) long epgStartTime;
-@property (nonatomic, readwrite) long epgEndTime;
+@property (nonatomic) NSMutableArray<StationRenderer *> *stations;
+@property (nonatomic) long startTime;
+@property (nonatomic) long endTime;
 @end
+
 ``` 
 
 #### C. Implement a method to initialize / create an EPG object: 
