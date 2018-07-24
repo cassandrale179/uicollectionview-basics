@@ -26,7 +26,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
 
 
-// Return content size here
+// Return content size
 - (CGSize)collectionViewContentSize{
   return contentSize;
 }
@@ -60,11 +60,11 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
             multFactor= [epg.stations[section].airings[item-1].airingEndTime timeIntervalSinceDate:epg.stations[section].airings[item-1].airingStartTime]/(timeInterval * 60.);
             attr = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           }else{
+            
             //some random constant for the size of the thumbnail
             multFactor = ThumbnailSize;
             attr = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           }
-
           attr.frame = CGRectMake(xPos, yPos, multFactor*CELL_WIDTH, CELL_HEIGHT);
           xPos += multFactor*CELL_WIDTH;
           [cellAttrDict setValue:attr forKey:cellIndex];
@@ -85,7 +85,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 # pragma mark ------ LAYOUT ATTRRIBUTE FOR ELEMENT IN RECT AND SUPPLEMENTARY VIEW --------
 // Return the frame for each cell (333.333 0; 200 100)
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect{
-
   NSMutableArray *attributesInRect = [[NSMutableArray alloc] init];
 
   // Array for normal airing cells
@@ -103,12 +102,10 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
     [attributesInRect addObject:attributes];
   }
 
-
   // Suplementary view for the station header of all the networks (Fox, CNN, ...etc.)
   NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViewsInRect:rect];
   for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView" atIndexPath:indexPath];
-
     // Make the network header scrolling pin to the left when scrolling horizontally
     CGPoint const contentOffset = self.collectionView.contentOffset;
     if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
@@ -122,19 +119,18 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
     }
     [attributesInRect addObject:attributes];
   }
-
+  
    //Supplementary view for time indicator cell
   UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"TimeIndicatorView" atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   [attributesInRect addObject:attributes];
+
   return attributesInRect;
 }
-
 
 // Layout Attribute for Supplementary View (the time header and the channel header)
 - (UICollectionViewLayoutAttributes *) layoutAttributesForSupplementaryViewOfKind:(NSString *)kind
                                                                       atIndexPath:(NSIndexPath *)indexPath{
   UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind withIndexPath:indexPath];
-
   if ([kind isEqualToString:@"HourHeaderView"]) {
     CGFloat widthPerHalfHour = CELL_WIDTH;
     CGFloat paddingSize = ThumbnailSize*CELL_WIDTH;
@@ -142,7 +138,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   }
   else if ([kind isEqualToString:@"ChannelHeaderView"]) {
     NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
-
+    
     //Finding frame of the airing cell as reference.
     UICollectionViewLayoutAttributes *attr = [cellAttrDict objectForKey:channelIndex];
     attributes.frame = CGRectMake(0, attr.frame.origin.y, ChannelHeaderWidth, ChannelHeaderHeight);
@@ -157,7 +153,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   return attributes;
 }
 
-# pragma mark ------ SUPPLEMENTARY VIEW METHODS FOR HOURS --------
+# pragma mark ------ TIMELINE SUPPLEMENTARY VIEW METHODS --------
 // Calculate the x coordinate of the hour
 - (NSInteger)hourIndexFromXCoordinate:(CGFloat)xPosition
 {
@@ -166,7 +162,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   NSInteger hourIndex = MAX((NSInteger)0, (NSInteger)((xPosition - ChannelHeaderWidth) / widthPerHalfHour));
   return hourIndex;
 }
-
 
 // Return an array of all the index paths for the hour
 - (NSArray *)indexPathsOfHourHeaderViewsInRect:(CGRect)rect
@@ -198,7 +193,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   if (CGRectGetMinX(rect) > ChannelHeaderWidth) {
     return [NSArray array];
   }
-
   NSInteger minChannelIndex = 0;
   NSInteger maxChannelIndex = [self channelIndexFromYCoordinate:CGRectGetMaxY(rect)]-1;
   NSMutableArray *indexPaths = [NSMutableArray array];
@@ -216,13 +210,13 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   return [cellAttrDict objectForKey:indexPath];
 }
 
-
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds{
   return YES;
 }
 
+// create the sample data to be used in deciding the size for the layout methods
 - (void) createEPG{
-  // Timestamp generator;
+  // Timestamp generator
   int from = 900;
   int to = 7200;
 
@@ -246,10 +240,8 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   // Create a nested array to hold all information
   NSArray *allTitles = [NSArray arrayWithObjects: d1, d2, d3, d4, d5,d6, d7, d8, d9, d10, nil];
 
-
   // Create an array of stations for one epg s
   for (int i = 0; i < [stationTitle count]; i++){
-
     StationRenderer *station = [[StationRenderer alloc] init];
     station.airings = [[NSMutableArray alloc] init];
 
@@ -265,7 +257,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 
       [station.airings addObject:airing];
     }
-
     station.stationName = stationTitle[i];
     [epg.stations addObject:station];
   }
