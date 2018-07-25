@@ -99,6 +99,19 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViewsInRect:rect];
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
+    
+    // Make the hour header scrolling pin to the top when scrolling vertically
+    CGPoint const contentOffset = self.collectionView.contentOffset;
+    if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
+      NSLog(@"this run");
+      CGPoint origin = attributes.frame.origin;
+      origin.y = contentOffset.y;
+      attributes.zIndex = 1024;
+      attributes.frame = (CGRect){
+        .origin = origin,
+        .size = attributes.frame.size
+      };
+    }
     [attributesInRect addObject:attributes];
   }
 
