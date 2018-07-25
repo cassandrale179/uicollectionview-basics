@@ -114,15 +114,29 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViewsInRect:rect];
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
+    
+    // Make the hour header scrolling pin to the top when scrolling vertically
+    CGPoint const contentOffset = self.collectionView.contentOffset;
+    if (self.scrollDirection == UICollectionViewScrollDirectionVertical) {
+      NSLog(@"this run");
+      CGPoint origin = attributes.frame.origin;
+      origin.y = contentOffset.y;
+      attributes.zIndex = 1024;
+      attributes.frame = (CGRect){
+        .origin = origin,
+        .size = attributes.frame.size
+      };
+    }
     [attributesInRect addObject:attributes];
   }
+
   for(NSIndexPath *indexPath in channelAttrDict){
     UICollectionViewLayoutAttributes *attributes = [channelAttrDict objectForKey:indexPath];
     if(CGRectIntersectsRect(rect, attributes.frame)){
       [attributesInRect addObject:attributes];
     }
-  }
-  
+  } 
+
   //Supplementary view for time indicator cell
   UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:@"TimeIndicatorView" atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   [attributesInRect addObject:attributes];
@@ -193,9 +207,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
 // Return index path for the stations
 - (NSArray *)indexPathsOfChannelHeaderViews
 {
-  //  if (CGRectGetMinX(rect) > ChannelHeaderWidth) {
-  //    return [NSArray array];
-  //  }
+
   NSInteger minChannelIndex = 0;
   NSInteger maxChannelIndex = epg.stations.count-1;
   NSMutableArray *indexPaths = [NSMutableArray array];
@@ -242,7 +254,7 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
   
   // Create a nested array to hold all information
   NSArray *allTitles = [NSArray arrayWithObjects: d1, d2, d3, d4, d5,d6, d7, d8, d9, d10, nil];
-  
+
   // Create an array of stations for one epg s
   for (int i = 0; i < [stationTitle count]; i++){
     StationRenderer *station = [[StationRenderer alloc] init];
