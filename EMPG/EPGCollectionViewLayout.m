@@ -120,8 +120,6 @@ static const CGFloat ThumbnailSize = 0.5;                       // size of the v
     };
     [hourAttrDict setValue:attributes forKey:indexPath];
   }
-  
-  NSLog(@"hour attribute dict %@", hourAttrDict);
 }
 
 # pragma mark ------ LAYOUT ATTRRIBUTE FOR ELEMENT IN RECT AND SUPPLEMENTARY VIEW --------
