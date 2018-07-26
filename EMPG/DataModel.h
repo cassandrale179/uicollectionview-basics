@@ -8,6 +8,7 @@
 - (void)setAiringTitle:(NSString *)titleValue;
 - (void)setAiringStartTime:(NSDate *)startTimeValue;
 - (void)setAiringEndTime:(NSDate *)endTimeValue;
+- (void)addTimes:(NSString *)duration forAiring:(AiringRenderer *)airing;
 @end
 // For each station, create a list of airings
 @interface StationRenderer : NSObject
