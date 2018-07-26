@@ -36,9 +36,7 @@ Boolean needSetup = true;
 // Return content size.
 - (CGSize)collectionViewContentSize {
   return contentSize;
-}
-
-- (void)prepareLayout {
+}- (void)prepareLayout {
   // Calculating the bounds (origin x and y) of the cells
   if (needSetup) {
     epg = [DataModel createEPG];
@@ -138,6 +136,8 @@ Boolean needSetup = true;
     [channelAttributes setValue:attributes forKey:indexPath];
   }
   
+  
+}
   
 
 #pragma mark Layout Attribute for Element in Rect and Supplementary View
