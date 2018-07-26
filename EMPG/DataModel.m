@@ -95,13 +95,9 @@
 }
 
 // Dynamic calculate start and end time of the UICollectionView
-<<<<<<< HEAD
-+ (NSMutableArray *) calculateEPGTime:(EPGRenderer *) epgObject{
-=======
 + (NSMutableArray *)calculateEPGTime:(EPGRenderer *)epgObject{
->>>>>>> 93f495193af3ce77a5d4f65469cc99e0b300cdf4
   NSMutableArray *timeArray = [[NSMutableArray alloc] init];
-  
+
   // Create an array of all airings
   NSMutableArray *allAirings = [[NSMutableArray alloc] init];
   for (StationRenderer* station in epgObject.stations){
@@ -109,7 +105,7 @@
       [allAirings addObject:airing];
     }
   }
-  
+
   // Sort all airing array to find start time and end time
   NSSortDescriptor *startTimeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"airingStartTime" ascending:YES];
   NSSortDescriptor *endTimeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"airingEndTime" ascending:NO];
@@ -117,16 +113,9 @@
   NSArray *sortedEndTimeArray = [allAirings sortedArrayUsingDescriptors:@[endTimeDescriptor]];
   NSDate *epgStartTime = ((AiringRenderer*)[sortedStartTimeArray objectAtIndex:0]).airingStartTime;
   NSDate *epgEndTime = ((AiringRenderer *)[sortedEndTimeArray objectAtIndex:0]).airingEndTime;
-<<<<<<< HEAD
-  
-  // Formatted start time and end time
-  NSDateFormatter *formatter = [NSDateFormatter new];
-  [formatter setDateFormat:@"mm"];
-  NSString *timeString = [formatter stringFromDate:epgStartTime];
-=======
   NSDate *formatStartTime = [self formatTime: epgStartTime];
   NSDate *formatEndTime = [self formatTime:epgEndTime];
-  
+
   // Build an array of time intervals
   NSDate *interval = formatStartTime;
   while (interval < formatEndTime){
@@ -136,13 +125,11 @@
   return timeArray;
 }
 
-
 // Formatted start time and end time
 + (NSDate *)formatTime:(NSDate *)dateToFormat{
   NSDateFormatter *formatter = [NSDateFormatter new];
   [formatter setDateFormat:@"mm"];
   NSString *timeString = [formatter stringFromDate:dateToFormat];
->>>>>>> 93f495193af3ce77a5d4f65469cc99e0b300cdf4
   int minutes = [timeString intValue];
   if (minutes < 30){
     minutes = 0;
@@ -150,11 +137,7 @@
   else{
     minutes = 30;
   }
-  
-<<<<<<< HEAD
 
-  return timeArray;
-=======
   // Modify the NSDate component
   NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
   NSDateComponents *comps = [calendar components:(
@@ -163,16 +146,5 @@
   comps.minute = minutes;
   NSDate *newDate = [calendar dateFromComponents:comps];
   return newDate;
->>>>>>> 93f495193af3ce77a5d4f65469cc99e0b300cdf4
 }
 @end
-
-
-//  NSDate* newDate = [epgStartTime dateByAddingTimeInterval:1800];
-//  NSLog(@"olddate %@", epgStartTime);
-//  NSLog(@"newdate %@", newDate);
-
-// Create an array of time intervals
-//  while (epgStartTime < epgEndTime){
-//    [timeArray addObject:epgStartTime];
-//  }
