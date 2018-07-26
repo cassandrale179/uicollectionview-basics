@@ -20,7 +20,7 @@
   NSString *timeIndicatorKind;
   NSString *timeCellKind;
   NSString *stationCellKind;
-
+  
 }
 @end
 // Implementation of the View Controller
@@ -38,18 +38,19 @@
   timeIndicatorIdentifier = NSStringFromClass([timeIndicatorKind class]);
   timeCellIdentifier = NSStringFromClass([TimeCell class]);
   stationCellIdentifier = NSStringFromClass([StationCell class]);
-
+  
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
-
+  
   // Create an epg object
   epg = [DataModel createEPG];
-
+  [DataModel calculateEPGTime:epg];
+  
   // Set Data Source and Delegate and Cell ID
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
   [collectionView setDataSource:self];
   [collectionView setDelegate: self];
-
+  
   // Register Class Method goes here
   [collectionView registerClass:[EPGCollectionViewCell class] forCellWithReuseIdentifier:@"epgCell"];
   [collectionView registerClass:[TimeCell class]
@@ -94,7 +95,7 @@ referenceSizeForHeaderInSection:(NSInteger)section {
 // For each cell in the index path, put information inside the cell
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
   EPGCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"epgCell" forIndexPath:indexPath];
-
+  
   //set the content of each cell
   if(indexPath.item!=0){
     [cell setup:epg.stations[indexPath.section].airings[indexPath.item-1].airingTitle withDescription:@"sampledescription"];
