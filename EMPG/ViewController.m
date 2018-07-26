@@ -22,9 +22,7 @@
   NSString *stationCellKind;
 
 }
-- (void) createEPG;
 @end
-
 // Implementation of the View Controller
 @implementation ViewController
 
@@ -45,7 +43,7 @@
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
 
   // Create an epg object
-  [self createEPG];
+  epg = [DataModel createEPG];
 
   // Set Data Source and Delegate and Cell ID
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
@@ -78,8 +76,6 @@ referenceSizeForHeaderInSection:(NSInteger)section {
   return CGSizeMake(60.0f, 60.0f);
 }
 
-
-#pragma mark ---------  CREATING THE CELL ---------
 // Return how many rows within UI Collection View
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
   NSInteger row = [epg.stations count];
@@ -129,58 +125,6 @@ referenceSizeForHeaderInSection:(NSInteger)section {
     return timeIndicatorCell;
   }
   return 0;
-  
-}
-
-#pragma mark --------- CREATE THE EPG ---------
-- (void) createEPG{
-
-  // Timestamp generator;
-  int from = 900;
-  int to = 7200;
-
-  // Create a list of stations
-  epg = [[EPGRenderer alloc]init];
-  epg.stations = [[NSMutableArray alloc] init];
-  NSArray *stationTitle = [NSArray arrayWithObjects: @"fox", @"kpix5", @"abc7", @"nbc11", @"thecw", @"food", @"hgtv", @"showtime", @"premiere", @"disney",nil];
-
-  // Create arrays to fill out information
-  NSArray *d1 = [NSArray arrayWithObjects: @"New Girl", @"The Mick", @"Big Bang Theory", nil];
-  NSArray *d2 = [NSArray arrayWithObjects: @"East TN South vs Furman", @"Postgame", @"The Late Show with Stephen Colbert", nil];
-  NSArray *d3 = [NSArray arrayWithObjects: @"The Gong Show", @"Battle of Network Stars", nil];
-  NSArray *d4 = [NSArray arrayWithObjects: @"I Want A Dog For Christmas, Charlie Brown", nil];
-  NSArray *d5 = [NSArray arrayWithObjects: @"Two And A Half Man", @"Howdie Mandel All-Star Comedy Gala", nil];
-  NSArray *d6 = [NSArray arrayWithObjects: @"New Girl", @"The Mick", @"Big Bang Theory", nil];
-  NSArray *d7 = [NSArray arrayWithObjects: @"East TN South vs Furman", @"Postgame", @"The Late Show with Stephen Colbert", nil];
-  NSArray *d8 = [NSArray arrayWithObjects: @"The Gong Show", @"Battle of Network Stars", nil];
-  NSArray *d9 = [NSArray arrayWithObjects: @"I Want A Dog For Christmas Charlie Brown", nil];
-  NSArray *d10 = [NSArray arrayWithObjects: @"Two And A Half Man", @"Howdie Mandel All-Star Comedy Gala", nil];
-
-  // Create a nested array to hold all information
-  NSArray *allTitles = [NSArray arrayWithObjects: d1, d2, d3, d4, d5,d6, d7, d8, d9, d10, nil];
-
-
-  // Create an array of stations for one epg s
-  for (int i = 0; i < [stationTitle count]; i++){
-
-    StationRenderer *station = [[StationRenderer alloc] init];
-    station.airings = [[NSMutableArray alloc] init];
-
-    // Create dummy variables for now
-    NSArray *dummyTitle = allTitles[i];
-
-    // Create an array of airings for each station
-    for (int j = 0; j < [dummyTitle count]; j++){
-      AiringRenderer *airing = [[AiringRenderer alloc] init];
-      airing.airingTitle = dummyTitle[j];
-      airing.airingStartTime = [NSDate date];
-      airing.airingEndTime = [NSDate dateWithTimeInterval:arc4random() % (to-from+1) sinceDate:airing.airingStartTime];
-      [station.airings addObject:airing];
-    }
-
-    station.stationName = stationTitle[i];
-    [epg.stations addObject:station];
-  }
 }
 
 // Dispose of any resources that can be recreated.
