@@ -186,7 +186,7 @@ Boolean needSetup = true;
     UICollectionViewLayoutAttributes *attr = [itemAttributes objectForKey:channelIndex];
     attributes.frame = CGRectMake(0, attr.frame.origin.y, kChannelHeaderWidth, kChannelHeaderHeight);
   } else if ([kind isEqualToString:timeIndicatorKind]) {
-    NSDate *timeAtFront = [NSDate date];
+    NSDate *timeAtFront = [timeArray objectAtIndex:0]; 
     CGFloat currentTimeMarker =
         [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront] /
         (60 * 30.) * kHalfHourWidth;
