@@ -137,32 +137,8 @@ Boolean needSetup = true;
     attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, 100, 100);
     [channelAttributes setValue:attributes forKey:indexPath];
   }
-}
-  }
-
-  // Create attributes for the Channel Header.
-  NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViews];
-  channelAttributes = [[NSMutableDictionary alloc] init];
-  for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
-    UICollectionViewLayoutAttributes *attributes =
-        [self layoutAttributesForSupplementaryViewOfKind:stationCellKind
-                                             atIndexPath:indexPath];
-
-    // Make the network header pin to the left when scrolling horizontally.
-    CGFloat xOffset = self.collectionView.contentOffset.x;
-    CGPoint origin = attributes.frame.origin;
-    origin.x = xOffset;
-    attributes.zIndex = [self zIndexForElementKind:stationCellKind];
-
-    // Getting attributes of the airing cells to vertically align the channel and airing cells.
-    UICollectionViewLayoutAttributes *cellattr =
-        [itemAttributes objectForKey:[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
-    attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, kChannelHeaderWidth, kChannelHeaderHeight);
-    [channelAttributes setValue:attributes forKey:indexPath];
-  }
-
   
-}
+  
 
 #pragma mark Layout Attribute for Element in Rect and Supplementary View
 // Return the frame for each cell (333.333 0; 200 100).
