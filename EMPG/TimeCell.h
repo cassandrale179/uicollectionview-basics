@@ -2,5 +2,5 @@
 
 @interface TimeCell : UICollectionReusableView
 @property (retain, nonatomic) IBOutlet UILabel *title;
--(void) setup: (NSString *) titleText;
+-(void) setup: (NSString *) timeText;
 @end
