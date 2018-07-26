@@ -45,6 +45,21 @@ Boolean needSetup = true;
     timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
     needSetup = false;
   }
+  // Create attributes for the Hour Header.
+  NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViews];
+  hourAttrDict = [[NSMutableDictionary alloc] init];
+  for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
+    UICollectionViewLayoutAttributes *attributes =
+        [self layoutAttributesForSupplementaryViewOfKind:timeCellKind atIndexPath:indexPath];
+
+    // Make the hour header pin to the top when scrolling vertically.
+    CGFloat yOffSet = self.collectionView.contentOffset.y;
+    CGPoint origin = attributes.frame.origin;
+    origin.y = yOffSet;
+    attributes.frame = (CGRect){.origin = origin, .size = attributes.frame.size};
+    attributes.zIndex = [self zIndexForElementKind:timeCellKind];
+    [hourAttrDict setValue:attributes forKey:indexPath];
+  }
   CGFloat xMax = 0;
   itemAttributes = [[NSMutableDictionary alloc] init];
   if (self.collectionView.numberOfSections > 0) {
@@ -52,11 +67,12 @@ Boolean needSetup = true;
       if ([self.collectionView numberOfItemsInSection:section] > 0) {
         CGFloat xPos = kChannelHeaderWidth;
         CGFloat yPos = kVerticalPadding + section * kCellHeight + kBorderPadding * section;
+        CGFloat numHalfHourIntervals;
 
         // Calculate the frame of each airing.
         for (int item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
           NSIndexPath *cellIndex = [NSIndexPath indexPathForItem:item inSection:section];
-          CGFloat numHalfHourIntervals;
+          
           UICollectionViewLayoutAttributes *attr;
 
           // If the cell is not a thumbnail
@@ -68,6 +84,12 @@ Boolean needSetup = true;
             if ([closerStartTime earlierDate:currentAiring.airingStartTime]){
               closerStartTime = currentAiring.airingStartTime;
             }
+            NSInteger closestTimeIndex =[timeArray indexOfObject:currentAiring.airingStartTime inSortedRange:NSMakeRange(0, timeArray.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2){
+              return [time1 compare:time2];
+            }]-1;
+            UICollectionViewLayoutAttributes *hourAttributes = [hourAttrDict objectForKey:[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
+            xPos = [closerStartTime timeIntervalSinceDate:[timeArray objectAtIndex:closestTimeIndex]] /
+            (kAiringIntervalMinutes * 60.)*kHalfHourWidth + hourAttributes.frame.origin.x;
             numHalfHourIntervals =
                 [currentAiring.airingEndTime
                     timeIntervalSinceDate:closerStartTime] /
@@ -84,7 +106,7 @@ Boolean needSetup = true;
           xPos += numHalfHourIntervals * kHalfHourWidth;
           [itemAttributes setValue:attr forKey:cellIndex];
         }
-        xMax = MAX(xMax, xPos);
+        xMax = MAX(xMax, xPos+numHalfHourIntervals * kHalfHourWidth);
       }
 
       // Return total content size of all cells within it.
@@ -116,21 +138,7 @@ Boolean needSetup = true;
     [channelAttributes setValue:attributes forKey:indexPath];
   }
 
-  // Create attributes for the Hour Header.
-  NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViews];
-  hourAttrDict = [[NSMutableDictionary alloc] init];
-  for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
-    UICollectionViewLayoutAttributes *attributes =
-        [self layoutAttributesForSupplementaryViewOfKind:timeCellKind atIndexPath:indexPath];
-
-    // Make the hour header pin to the top when scrolling vertically.
-    CGFloat yOffSet = self.collectionView.contentOffset.y;
-    CGPoint origin = attributes.frame.origin;
-    origin.y = yOffSet;
-    attributes.frame = (CGRect){.origin = origin, .size = attributes.frame.size};
-    attributes.zIndex = [self zIndexForElementKind:timeCellKind];
-    [hourAttrDict setValue:attributes forKey:indexPath];
-  }
+  
 }
 
 #pragma mark Layout Attribute for Element in Rect and Supplementary View
