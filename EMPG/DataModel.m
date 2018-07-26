@@ -95,7 +95,11 @@
 }
 
 // Dynamic calculate start and end time of the UICollectionView
+<<<<<<< HEAD
 + (NSMutableArray *) calculateEPGTime:(EPGRenderer *) epgObject{
+=======
++ (NSMutableArray *)calculateEPGTime:(EPGRenderer *)epgObject{
+>>>>>>> 93f495193af3ce77a5d4f65469cc99e0b300cdf4
   NSMutableArray *timeArray = [[NSMutableArray alloc] init];
   
   // Create an array of all airings
@@ -113,11 +117,32 @@
   NSArray *sortedEndTimeArray = [allAirings sortedArrayUsingDescriptors:@[endTimeDescriptor]];
   NSDate *epgStartTime = ((AiringRenderer*)[sortedStartTimeArray objectAtIndex:0]).airingStartTime;
   NSDate *epgEndTime = ((AiringRenderer *)[sortedEndTimeArray objectAtIndex:0]).airingEndTime;
+<<<<<<< HEAD
   
   // Formatted start time and end time
   NSDateFormatter *formatter = [NSDateFormatter new];
   [formatter setDateFormat:@"mm"];
   NSString *timeString = [formatter stringFromDate:epgStartTime];
+=======
+  NSDate *formatStartTime = [self formatTime: epgStartTime];
+  NSDate *formatEndTime = [self formatTime:epgEndTime];
+  
+  // Build an array of time intervals
+  NSDate *interval = formatStartTime;
+  while (interval < formatEndTime){
+    interval = [interval dateByAddingTimeInterval:1800];
+    [timeArray addObject:interval];
+  }
+  return timeArray;
+}
+
+
+// Formatted start time and end time
++ (NSDate *)formatTime:(NSDate *)dateToFormat{
+  NSDateFormatter *formatter = [NSDateFormatter new];
+  [formatter setDateFormat:@"mm"];
+  NSString *timeString = [formatter stringFromDate:dateToFormat];
+>>>>>>> 93f495193af3ce77a5d4f65469cc99e0b300cdf4
   int minutes = [timeString intValue];
   if (minutes < 30){
     minutes = 0;
@@ -126,8 +151,19 @@
     minutes = 30;
   }
   
+<<<<<<< HEAD
 
   return timeArray;
+=======
+  // Modify the NSDate component
+  NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+  NSDateComponents *comps = [calendar components:(
+    NSCalendarUnitHour | NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear)
+    fromDate:dateToFormat];
+  comps.minute = minutes;
+  NSDate *newDate = [calendar dateFromComponents:comps];
+  return newDate;
+>>>>>>> 93f495193af3ce77a5d4f65469cc99e0b300cdf4
 }
 @end
 

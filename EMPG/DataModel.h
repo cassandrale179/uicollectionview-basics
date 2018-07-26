@@ -27,5 +27,6 @@
 // Create DataModel Class
 @interface DataModel : NSObject
 + (EPGRenderer *)createEPG;
-+ (NSMutableArray *) calculateEPGTime:(EPGRenderer *) epgObject;
++ (NSMutableArray *) calculateEPGTime:(EPGRenderer *)epgObject;
++ (NSDate *)formatTime:(NSDate *)dateToFormat;
 @end
