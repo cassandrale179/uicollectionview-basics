@@ -13,11 +13,13 @@
   return self;
 }
 
-- (void) setup: (NSString *) titleText{
+- (void) setup: (NSDate *) timeText{
   self.layer.borderWidth = 2.0f;
   self.layer.borderColor = [UIColor blackColor].CGColor;
   self.layer.backgroundColor = [UIColor whiteColor].CGColor;
-  self.title.text = titleText;
+  NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+  [formatter setDateFormat: @"HH:mm"];
+  self.title.text = [formatter stringFromDate:timeText];
 }
 
 @end

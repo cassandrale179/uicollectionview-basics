@@ -58,12 +58,8 @@
 // create the sample data to be used in deciding the size for the layout methods
 + (EPGRenderer *)createEPG {
   EPGRenderer *epg = [[EPGRenderer alloc] init];
-  // Timestamp generator
-  int from = 900;
-  int to = 7200;
-
+  
   // Create a list of stations
-  //  epg.stations = [[NSMutableArray alloc] init];
   NSMutableArray *epgStations = [[NSMutableArray alloc] init];
   NSArray *stationTitle =
       [NSArray arrayWithObjects:@"fox", @"kpix5", @"abc7", @"nbc11", @"thecw", @"food", @"hgtv",
@@ -71,7 +67,7 @@
 
   // Create arrays to fill out information
   NSArray *d1 = [NSArray arrayWithObjects:@"New Girl", @"The Mick", @"Big Bang Theory", nil];
-  NSArray *times1 = [NSArray arrayWithObjects:@"9:00-9:30", @"9:30-10:00", @"10:00-12:00", nil];
+  NSArray *times1 = [NSArray arrayWithObjects:@"8:00-9:30", @"9:30-10:00", @"10:00-12:00", nil];
   NSArray *d2 = [NSArray arrayWithObjects:@"East TN South vs Furman", @"Postgame",
                                           @"The Late Show with Stephen Colbert", nil];
   NSArray *times2 = [NSArray arrayWithObjects:@"9:00-9:45", @"9:45-10:00", @"10:00-12:00", nil];
@@ -128,7 +124,7 @@
 }
 
 // Dynamic calculate start and end time of the UICollectionView
-+ (NSMutableArray *)calculateEPGTime:(EPGRenderer *)epgObject{
++ (NSMutableArray *)calculateEPGTime:(EPGRenderer *)epgObject timeInterval:(NSInteger)time{
   NSMutableArray *timeArray = [[NSMutableArray alloc] init];
   
   // Create an array of all airings
@@ -152,8 +148,8 @@
   // Build an array of time intervals
   NSDate *interval = formatStartTime;
   while (interval < formatEndTime){
-    interval = [interval dateByAddingTimeInterval:1800];
     [timeArray addObject:interval];
+    interval = [interval dateByAddingTimeInterval:time*60];
   }
   return timeArray;
 }

@@ -2,24 +2,17 @@
 #import "DataModel.h"
 
 @implementation EPGCollectionViewLayout{
-
-// Dictionary for cell types
-NSMutableDictionary *itemAttributes;
-NSMutableDictionary *channelAttributes;
-NSMutableDictionary *hourAttrDict;
+// Dictionary for cell types and time array
+  NSMutableDictionary *itemAttributes;
+  NSMutableDictionary *channelAttributes;
+  NSMutableDictionary *hourAttrDict;
+  NSMutableArray *timeArray;
 }
+
 // Measurement constants
-CGFloat const CELL_HEIGHT = 100;
+CGFloat const kCellHeight = 100;
 CGFloat const kHalfHourWidth = 400;
-CGSize contentSize;
 
-CGFloat kAiringIntervalMinutes = 30;
-CGFloat currentTime = 15;
-CGFloat endTime = 25;
-CGFloat firstTime = 0;  // first time showing on the screen
-EPGRenderer *epg;
-
-Boolean needSetup = true;
 
 // Constants for views
 NSString *timeIndicatorKind = @"TimeIndicatorView";
@@ -32,6 +25,11 @@ static const CGFloat kChannelHeaderHeight = 100;  // height of each channel cell
 static const CGFloat kChannelHeaderWidth = 100;   // width of each channel cell
 static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
 
+// Other attributes
+EPGRenderer *epg;
+CGSize contentSize;
+Boolean needSetup = true;
+
 // Return content size
 - (CGSize)collectionViewContentSize {
   return contentSize;
@@ -42,6 +40,7 @@ static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
   // Calculating the bounds (origin x and y) of the cells
   if (needSetup) {
     epg = [DataModel createEPG];
+    timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
     needSetup = false;
   }
   CGFloat xMax = 0;
@@ -50,7 +49,7 @@ static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
     for (int section = 0; section < self.collectionView.numberOfSections; section++) {
       if ([self.collectionView numberOfItemsInSection:section] > 0) {
         CGFloat xPos = kChannelHeaderWidth;
-        CGFloat yPos = kVerticalPadding + section * CELL_HEIGHT + kBorderPadding * section;
+        CGFloat yPos = kVerticalPadding + section * kCellHeight + kBorderPadding * section;
 
         // Calculate the frame of each airing
         for (int item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
@@ -63,9 +62,13 @@ static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
             
             // subtract 1 to account for the thumbnail cell at item index 0
             AiringRenderer *currentAiring = epg.stations[section].airings[item - 1];
+            NSDate *closerStartTime = [timeArray objectAtIndex:0];
+            if ([closerStartTime earlierDate:currentAiring.airingStartTime]){
+              closerStartTime = currentAiring.airingStartTime;
+            }
             numHalfHourIntervals =
                 [currentAiring.airingEndTime
-                    timeIntervalSinceDate:currentAiring.airingStartTime] /
+                    timeIntervalSinceDate:closerStartTime] /
                 (kAiringIntervalMinutes * 60.);
             attr =
                 [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
@@ -75,7 +78,7 @@ static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
             attr =
                 [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           }
-          attr.frame = CGRectMake(xPos, yPos, numHalfHourIntervals * kHalfHourWidth, CELL_HEIGHT);
+          attr.frame = CGRectMake(xPos, yPos, numHalfHourIntervals * kHalfHourWidth, kCellHeight);
           xPos += numHalfHourIntervals * kHalfHourWidth;
           [itemAttributes setValue:attr forKey:cellIndex];
         }
@@ -85,7 +88,7 @@ static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
       // Return total content size of all cells within it
       CGFloat contentWidth = xMax;
       CGFloat contentHeight =
-          [self.collectionView numberOfSections] * (CELL_HEIGHT + kBorderPadding) + kVerticalPadding;
+          [self.collectionView numberOfSections] * (kCellHeight + kBorderPadding) + kVerticalPadding;
       contentSize = CGSizeMake(contentWidth, contentHeight);
     }
   }

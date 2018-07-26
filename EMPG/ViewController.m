@@ -11,6 +11,7 @@
 @interface ViewController () <UICollectionViewDelegateFlowLayout>{
   UICollectionView *collectionView;
   UICollectionViewFlowLayout *flowLayout;
+  NSMutableArray *timeArray;
   EPGRenderer *epg;
   
   // Identifier and view kind constants
@@ -44,7 +45,7 @@
   
   // Create an epg object
   epg = [DataModel createEPG];
-  [DataModel calculateEPGTime:epg];
+  timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
   
   // Set Data Source and Delegate and Cell ID
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
@@ -113,7 +114,7 @@ referenceSizeForHeaderInSection:(NSInteger)section {
                                  atIndexPath:(NSIndexPath *)indexPath{
   if ([kind isEqualToString:timeCellKind]){
     TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: timeCellKind withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
-    [timeCell setup: [NSString stringWithFormat:@"%ld:00 PM", indexPath.item]];
+    [timeCell setup: [timeArray objectAtIndex: indexPath.item]];
     return timeCell;
   }
   else if ([kind isEqualToString:@"ChannelHeaderView"]){
