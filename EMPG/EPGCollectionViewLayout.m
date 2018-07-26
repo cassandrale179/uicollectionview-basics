@@ -1,24 +1,24 @@
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
 
-@implementation EPGCollectionViewLayout
+@implementation EPGCollectionViewLayout{
 
 // Dictionary for cell types
-NSMutableDictionary *cellAttrDict;
-NSMutableDictionary *channelAttrDict;
+NSMutableDictionary *itemAttributes;
+NSMutableDictionary *channelAttributes;
 NSMutableDictionary *hourAttrDict;
-
+}
 // Measurement constants
-CGFloat CELL_HEIGHT = 100;
-CGFloat CELL_WIDTH = 400;
+CGFloat const CELL_HEIGHT = 100;
+CGFloat const kHalfHourWidth = 400;
 CGSize contentSize;
-CGFloat borderPadding = 30;
-CGFloat timeInterval = 30;
+
+CGFloat kAiringIntervalMinutes = 30;
 CGFloat currentTime = 15;
 CGFloat endTime = 25;
 CGFloat firstTime = 0;  // first time showing on the screen
 EPGRenderer *epg;
-CGFloat yPadding = 50;
+
 Boolean needSetup = true;
 
 // Constants for views
@@ -27,11 +27,10 @@ NSString *timeCellKind = @"HourHeaderView";
 NSString *stationCellKind = @"ChannelHeaderView";
 
 // Constants for supplementary view
-static const NSUInteger HalfHours = 3;           // display show within next 3 half-hour
-static const CGFloat HourHeaderHeight = 40;      // height of each time cell
-static const CGFloat ChannelHeaderHeight = 100;  // height of each channel cell
-static const CGFloat ChannelHeaderWidth = 100;   // width of each channel cell
-static const CGFloat ThumbnailSize = 0.5;        // size of the video thumbnail
+static const CGFloat kHourHeaderHeight = 40;      // height of each time cell
+static const CGFloat kChannelHeaderHeight = 100;  // height of each channel cell
+static const CGFloat kChannelHeaderWidth = 100;   // width of each channel cell
+static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
 
 // Return content size
 - (CGSize)collectionViewContentSize {
@@ -46,36 +45,39 @@ static const CGFloat ThumbnailSize = 0.5;        // size of the video thumbnail
     needSetup = false;
   }
   CGFloat xMax = 0;
-  cellAttrDict = [[NSMutableDictionary alloc] init];
+  itemAttributes = [[NSMutableDictionary alloc] init];
   if (self.collectionView.numberOfSections > 0) {
     for (int section = 0; section < self.collectionView.numberOfSections; section++) {
       if ([self.collectionView numberOfItemsInSection:section] > 0) {
-        CGFloat xPos = ChannelHeaderWidth;
-        CGFloat yPos = yPadding + section * CELL_HEIGHT + borderPadding * section;
+        CGFloat xPos = kChannelHeaderWidth;
+        CGFloat yPos = kVerticalPadding + section * CELL_HEIGHT + kBorderPadding * section;
 
         // Calculate the frame of each airing
         for (int item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
           NSIndexPath *cellIndex = [NSIndexPath indexPathForItem:item inSection:section];
-          CGFloat multFactor;
+          CGFloat numHalfHourIntervals;
           UICollectionViewLayoutAttributes *attr;
 
           // If the cell is not a thumbnail
           if (item != 0) {
-            multFactor =
-                [epg.stations[section].airings[item - 1].airingEndTime
-                    timeIntervalSinceDate:epg.stations[section].airings[item - 1].airingStartTime] /
-                (timeInterval * 60.);
+            
+            // subtract 1 to account for the thumbnail cell at item index 0
+            AiringRenderer *currentAiring = epg.stations[section].airings[item - 1];
+            numHalfHourIntervals =
+                [currentAiring.airingEndTime
+                    timeIntervalSinceDate:currentAiring.airingStartTime] /
+                (kAiringIntervalMinutes * 60.);
             attr =
                 [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           } else {
             // some random constant for the size of the thumbnail
-            multFactor = ThumbnailSize;
+            numHalfHourIntervals = kThumbnailSize;
             attr =
                 [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           }
-          attr.frame = CGRectMake(xPos, yPos, multFactor * CELL_WIDTH, CELL_HEIGHT);
-          xPos += multFactor * CELL_WIDTH;
-          [cellAttrDict setValue:attr forKey:cellIndex];
+          attr.frame = CGRectMake(xPos, yPos, numHalfHourIntervals * kHalfHourWidth, CELL_HEIGHT);
+          xPos += numHalfHourIntervals * kHalfHourWidth;
+          [itemAttributes setValue:attr forKey:cellIndex];
         }
         xMax = MAX(xMax, xPos);
       }
@@ -83,30 +85,30 @@ static const CGFloat ThumbnailSize = 0.5;        // size of the video thumbnail
       // Return total content size of all cells within it
       CGFloat contentWidth = xMax;
       CGFloat contentHeight =
-          [self.collectionView numberOfSections] * (CELL_HEIGHT + borderPadding) + yPadding;
+          [self.collectionView numberOfSections] * (CELL_HEIGHT + kBorderPadding) + kVerticalPadding;
       contentSize = CGSizeMake(contentWidth, contentHeight);
     }
   }
 
   // Creating attributes for the Channel Header
   NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViews];
-  channelAttrDict = [[NSMutableDictionary alloc] init];
+  channelAttributes = [[NSMutableDictionary alloc] init];
   for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
     UICollectionViewLayoutAttributes *attributes =
-        [self layoutAttributesForSupplementaryViewOfKind:@"ChannelHeaderView"
+        [self layoutAttributesForSupplementaryViewOfKind:stationCellKind
                                              atIndexPath:indexPath];
 
     // Make the network header pin to the left when scrolling horizontally
     CGFloat xOffset = self.collectionView.contentOffset.x;
     CGPoint origin = attributes.frame.origin;
     origin.x = xOffset;
-    attributes.zIndex = 100;
+    attributes.zIndex = [self zIndexForElementKind:stationCellKind];
 
     // Getting attributes of the airing cells to vertically align the channel and airing cells.
     UICollectionViewLayoutAttributes *cellattr =
-        [cellAttrDict objectForKey:[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
+        [itemAttributes objectForKey:[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
     attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, 100, 100);
-    [channelAttrDict setValue:attributes forKey:indexPath];
+    [channelAttributes setValue:attributes forKey:indexPath];
   }
 
   // Creating attributes for the Hour Header
@@ -114,13 +116,14 @@ static const CGFloat ThumbnailSize = 0.5;        // size of the video thumbnail
   hourAttrDict = [[NSMutableDictionary alloc] init];
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes =
-        [self layoutAttributesForSupplementaryViewOfKind:@"HourHeaderView" atIndexPath:indexPath];
+        [self layoutAttributesForSupplementaryViewOfKind:timeCellKind atIndexPath:indexPath];
 
     // Make the hour header pin to the top when scrolling vertically
     CGFloat yOffSet = self.collectionView.contentOffset.y;
     CGPoint origin = attributes.frame.origin;
     origin.y = yOffSet;
     attributes.frame = (CGRect){.origin = origin, .size = attributes.frame.size};
+    attributes.zIndex = [self zIndexForElementKind:timeCellKind];
     [hourAttrDict setValue:attributes forKey:indexPath];
   }
 }
@@ -131,14 +134,14 @@ static const CGFloat ThumbnailSize = 0.5;        // size of the video thumbnail
   NSMutableArray *attributesInRect = [[NSMutableArray alloc] init];
 
   // Add all the attributes to attributesInRect (the entire view)
-  for (NSIndexPath *indexPath in cellAttrDict) {
-    UICollectionViewLayoutAttributes *attributes = [cellAttrDict objectForKey:indexPath];
+  for (NSIndexPath *indexPath in itemAttributes) {
+    UICollectionViewLayoutAttributes *attributes = [itemAttributes objectForKey:indexPath];
     if (CGRectIntersectsRect(rect, attributes.frame)) {
       [attributesInRect addObject:attributes];
     }
   }
-  for (NSIndexPath *indexPath in channelAttrDict) {
-    UICollectionViewLayoutAttributes *attributes = [channelAttrDict objectForKey:indexPath];
+  for (NSIndexPath *indexPath in channelAttributes) {
+    UICollectionViewLayoutAttributes *attributes = [channelAttributes objectForKey:indexPath];
     if (CGRectIntersectsRect(rect, attributes.frame)) {
       [attributesInRect addObject:attributes];
     }
@@ -166,17 +169,17 @@ static const CGFloat ThumbnailSize = 0.5;        // size of the video thumbnail
       [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind
                                                                      withIndexPath:indexPath];
   if ([kind isEqualToString:timeCellKind]) {
-    CGFloat widthPerHalfHour = CELL_WIDTH;
-    CGFloat paddingSize = ThumbnailSize * CELL_WIDTH;
+    CGFloat widthPerHalfHour = kHalfHourWidth;
+    CGFloat paddingSize = kThumbnailSize * kHalfHourWidth;
     attributes.frame =
-        CGRectMake(ChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0,
-                   widthPerHalfHour, HourHeaderHeight);
+        CGRectMake(kChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0,
+                   widthPerHalfHour, kHourHeaderHeight);
   } else if ([kind isEqualToString:stationCellKind]) {
     NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
 
     // Finding frame of the airing cell as reference.
-    UICollectionViewLayoutAttributes *attr = [cellAttrDict objectForKey:channelIndex];
-    attributes.frame = CGRectMake(0, attr.frame.origin.y, ChannelHeaderWidth, ChannelHeaderHeight);
+    UICollectionViewLayoutAttributes *attr = [itemAttributes objectForKey:channelIndex];
+    attributes.frame = CGRectMake(0, attr.frame.origin.y, kChannelHeaderWidth, kChannelHeaderHeight);
   } else if ([kind isEqualToString:timeIndicatorKind]) {
     CGFloat cellStandardWidth = 400;
     NSDate *timeAtFront = [NSDate date];
@@ -185,8 +188,20 @@ static const CGFloat ThumbnailSize = 0.5;        // size of the video thumbnail
         (60 * 30.) * cellStandardWidth;
     CGFloat topOfIndicator = 20;
     attributes.frame = CGRectMake(currentTimeMarker, topOfIndicator, 2, contentSize.height);
+    attributes.zIndex = [self zIndexForElementKind:timeIndicatorKind];
   }
   return attributes;
+}
+
+- (CGFloat)zIndexForElementKind:(NSString *)elementKind{
+  if ([elementKind isEqualToString:timeIndicatorKind]){
+    return 10;
+  }else if([elementKind isEqualToString:stationCellKind]){
+    return 20;
+  }else if([elementKind isEqualToString:timeCellKind]){
+    return 30;
+  }
+  return 1;
 }
 
 #pragma mark------ TIMELINE SUPPLEMENTARY VIEW METHODS --------
@@ -223,7 +238,7 @@ static const CGFloat ThumbnailSize = 0.5;        // size of the video thumbnail
 
 #pragma mark----- HELPER METHODS ------
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
-  return [cellAttrDict objectForKey:indexPath];
+  return [itemAttributes objectForKey:indexPath];
 }
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {
