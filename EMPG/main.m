@@ -1,5 +1,4 @@
 #import <UIKit/UIKit.h>
-#import "DataModel.h"
 #import "AppDelegate.h"
 
 int main(int argc, char * argv[]) {
