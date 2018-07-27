@@ -56,21 +56,21 @@ Boolean needSetup = true;
     origin.y = yOffSet;
     attributes.frame = (CGRect){.origin = origin, .size = attributes.frame.size};
     attributes.zIndex = [self zIndexForElementKind:timeCellKind];
-    [hourAttrDict setValue:attributes forKey:indexPath];
+    hourAttrDict[indexPath] = attributes;
   }
   
   // Create attributes for the Airing Cells.
   CGFloat xMax = 0;
   itemAttributes = [[NSMutableDictionary alloc] init];
   if (self.collectionView.numberOfSections > 0) {
-    for (int section = 0; section < self.collectionView.numberOfSections; section++) {
+    for (NSInteger section = 0; section < self.collectionView.numberOfSections; section++) {
       if ([self.collectionView numberOfItemsInSection:section] > 0) {
         CGFloat xPos = kChannelHeaderWidth;
         CGFloat yPos = kVerticalPadding + section * kCellHeight + kBorderPadding * section;
         CGFloat numHalfHourIntervals;
         
         // Calculate the frame of each airing cell.
-        for (int item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
+        for (NSInteger item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
           NSIndexPath *cellIndex = [NSIndexPath indexPathForItem:item inSection:section];
           UICollectionViewLayoutAttributes *attr;
           
@@ -88,12 +88,11 @@ Boolean needSetup = true;
             NSInteger closestTimeIndex =[timeArray indexOfObject:currentAiring.airingStartTime inSortedRange:NSMakeRange(0, timeArray.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2){
               return [time1 compare:time2];
             }]-1;
-            UICollectionViewLayoutAttributes *hourAttributes = [hourAttrDict objectForKey:[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
+            UICollectionViewLayoutAttributes *hourAttributes = hourAttrDict[[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
             xPos = [closerStartTime timeIntervalSinceDate:timeArray[closestTimeIndex]] /
             (kAiringIntervalMinutes * 60.)*kHalfHourWidth + hourAttributes.frame.origin.x;
             numHalfHourIntervals = [currentAiring.airingEndTime
-                                    timeIntervalSinceDate:closerStartTime] /
-            (kAiringIntervalMinutes * 60.);
+                                    timeIntervalSinceDate:closerStartTime] / (kAiringIntervalMinutes * 60.);
             attr = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           } else {
             // Set constant for the size of the thumbnail.
@@ -102,7 +101,7 @@ Boolean needSetup = true;
             [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           }
           attr.frame = CGRectMake(xPos, yPos, numHalfHourIntervals * kHalfHourWidth, kCellHeight);
-          [itemAttributes setValue:attr forKey:cellIndex];
+          itemAttributes[cellIndex] = attr;
         }
         xMax = MAX(xMax, xPos+numHalfHourIntervals * kHalfHourWidth);
       }
@@ -129,13 +128,10 @@ Boolean needSetup = true;
     attributes.zIndex = [self zIndexForElementKind:stationCellKind];
     
     // Get attributes of the airing cells to vertically align the channel and airing cells.
-    UICollectionViewLayoutAttributes *cellattr =
-    [itemAttributes objectForKey:[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
+    UICollectionViewLayoutAttributes *cellattr = itemAttributes[[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
     attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, 100, 100);
-    [channelAttributes setValue:attributes forKey:indexPath];
+    channelAttributes[indexPath] = attributes;
   }
-  
-  
 }
   
 
@@ -146,19 +142,19 @@ Boolean needSetup = true;
 
   // Add all the attributes to attributesInRect (the entire view).
   for (NSIndexPath *indexPath in itemAttributes) {
-    UICollectionViewLayoutAttributes *attributes = [itemAttributes objectForKey:indexPath];
+    UICollectionViewLayoutAttributes *attributes = itemAttributes[indexPath];
     if (CGRectIntersectsRect(rect, attributes.frame)) {
       [attributesInRect addObject:attributes];
     }
   }
   for (NSIndexPath *indexPath in channelAttributes) {
-    UICollectionViewLayoutAttributes *attributes = [channelAttributes objectForKey:indexPath];
+    UICollectionViewLayoutAttributes *attributes = channelAttributes[indexPath];
     if (CGRectIntersectsRect(rect, attributes.frame)) {
       [attributesInRect addObject:attributes];
     }
   }
   for (NSIndexPath *indexPath in hourAttrDict) {
-    UICollectionViewLayoutAttributes *attributes = [hourAttrDict objectForKey:indexPath];
+    UICollectionViewLayoutAttributes *attributes = hourAttrDict[indexPath];
     if (CGRectIntersectsRect(rect, attributes.frame)) {
       [attributesInRect addObject:attributes];
     }
@@ -186,7 +182,7 @@ Boolean needSetup = true;
     NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
 
     // Find frame of the airing cell as reference.
-    UICollectionViewLayoutAttributes *attr = [itemAttributes objectForKey:channelIndex];
+    UICollectionViewLayoutAttributes *attr = itemAttributes[channelIndex];
     attributes.frame = CGRectMake(0, attr.frame.origin.y, kChannelHeaderWidth, kChannelHeaderHeight);
   } else if ([kind isEqualToString:timeIndicatorKind]) {
     NSDate *timeAtFront = timeArray[0];
@@ -243,7 +239,7 @@ Boolean needSetup = true;
 
 #pragma mark Helper methods
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
-  return [itemAttributes objectForKey:indexPath];
+  return itemAttributes[indexPath];
 }
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {
