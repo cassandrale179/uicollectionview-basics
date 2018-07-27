@@ -23,7 +23,7 @@
 -(void) setup: (NSString *) titleText withDescription:(NSString *)descriptionText;
 /**
  * This set up the thumb nail view for the image of the first airing cell
- * @param thubnailview is an image to be displayed
+ * @param thumbnailview is an image to be displayed
  */
 -(void) setThumbnailView:(UIImageView *)thumbnailView;
 @end
