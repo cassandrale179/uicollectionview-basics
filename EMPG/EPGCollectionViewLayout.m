@@ -13,7 +13,6 @@
 CGFloat const kCellHeight = 100;
 CGFloat const kHalfHourWidth = 400;
 
-
 // Constants for views
 NSString *timeIndicatorKind = @"TimeIndicatorView";
 NSString *timeCellKind = @"HourHeaderView";
@@ -31,26 +30,27 @@ EPGRenderer *epg;
 CGSize contentSize;
 Boolean needSetup = true;
 
-
 #pragma mark Prepare Layout Method
 // Return content size.
 - (CGSize)collectionViewContentSize {
   return contentSize;
-}- (void)prepareLayout {
-  // Calculating the bounds (origin x and y) of the cells
+}
+
+- (void)prepareLayout {
+  // Calculating the bounds (origin x and y) of the cells.
   if (needSetup) {
     epg = [DataModel createEPG];
     timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
     needSetup = false;
   }
-  // Creating attributes for the Hour Header
+  // Create attributes for the Hour Header.
   NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViews];
   hourAttrDict = [[NSMutableDictionary alloc] init];
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes =
     [self layoutAttributesForSupplementaryViewOfKind:timeCellKind atIndexPath:indexPath];
     
-    // Make the hour header pin to the top when scrolling vertically
+    // Make the hour header pin to the top when scrolling vertically.
     CGFloat yOffSet = self.collectionView.contentOffset.y;
     CGPoint origin = attributes.frame.origin;
     origin.y = yOffSet;
@@ -59,6 +59,7 @@ Boolean needSetup = true;
     [hourAttrDict setValue:attributes forKey:indexPath];
   }
   
+  // Create attributes for the Airing Cells.
   CGFloat xMax = 0;
   itemAttributes = [[NSMutableDictionary alloc] init];
   if (self.collectionView.numberOfSections > 0) {
@@ -67,20 +68,20 @@ Boolean needSetup = true;
         CGFloat xPos = kChannelHeaderWidth;
         CGFloat yPos = kVerticalPadding + section * kCellHeight + kBorderPadding * section;
         CGFloat numHalfHourIntervals;
-        // Calculate the frame of each airing
+        
+        // Calculate the frame of each airing cell.
         for (int item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
           NSIndexPath *cellIndex = [NSIndexPath indexPathForItem:item inSection:section];
-          
           UICollectionViewLayoutAttributes *attr;
           
           // If the cell is not a thumbnail
           if (item != 0) {
             
-            // subtract 1 to account for the thumbnail cell at item index 0
+            // Subtract 1 to account for the thumbnail cell at item index 0.
             AiringRenderer *currentAiring = epg.stations[section].airings[item - 1];
             
-            //Mainly for the first airing cell: in case the show started before the first time in the time header cells.
-            NSDate *closerStartTime = [timeArray objectAtIndex:0];
+            // For first airing cell in case the show started before the first time in the time header cells.
+            NSDate *closerStartTime = timeArray[0];
             if ([closerStartTime earlierDate:currentAiring.airingStartTime]){
               closerStartTime = currentAiring.airingStartTime;
             }
@@ -88,15 +89,14 @@ Boolean needSetup = true;
               return [time1 compare:time2];
             }]-1;
             UICollectionViewLayoutAttributes *hourAttributes = [hourAttrDict objectForKey:[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
-            xPos = [closerStartTime timeIntervalSinceDate:[timeArray objectAtIndex:closestTimeIndex]] /
+            xPos = [closerStartTime timeIntervalSinceDate:timeArray[closestTimeIndex]] /
             (kAiringIntervalMinutes * 60.)*kHalfHourWidth + hourAttributes.frame.origin.x;
             numHalfHourIntervals = [currentAiring.airingEndTime
                                     timeIntervalSinceDate:closerStartTime] /
             (kAiringIntervalMinutes * 60.);
-            attr =
-            [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
+            attr = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           } else {
-            // some random constant for the size of the thumbnail
+            // Set constant for the size of the thumbnail.
             numHalfHourIntervals = kThumbnailSize;
             attr =
             [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
@@ -107,15 +107,14 @@ Boolean needSetup = true;
         xMax = MAX(xMax, xPos+numHalfHourIntervals * kHalfHourWidth);
       }
       
-      // Return total content size of all cells within it
+      // Return total content size of all cells within it.
       CGFloat contentWidth = xMax;
-      CGFloat contentHeight =
-      [self.collectionView numberOfSections] * (kCellHeight + kBorderPadding) + kVerticalPadding;
+      CGFloat contentHeight = [self.collectionView numberOfSections] * (kCellHeight + kBorderPadding) + kVerticalPadding;
       contentSize = CGSizeMake(contentWidth, contentHeight);
     }
   }
   
-  // Creating attributes for the Channel Header
+  // Create attributes for the Channel Header.
   NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViews];
   channelAttributes = [[NSMutableDictionary alloc] init];
   for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
@@ -123,13 +122,13 @@ Boolean needSetup = true;
     [self layoutAttributesForSupplementaryViewOfKind:stationCellKind
                                          atIndexPath:indexPath];
     
-    // Make the network header pin to the left when scrolling horizontally
+    // Make the network header pin to the left when scrolling horizontally.
     CGFloat xOffset = self.collectionView.contentOffset.x;
     CGPoint origin = attributes.frame.origin;
     origin.x = xOffset;
     attributes.zIndex = [self zIndexForElementKind:stationCellKind];
     
-    // Getting attributes of the airing cells to vertically align the channel and airing cells.
+    // Get attributes of the airing cells to vertically align the channel and airing cells.
     UICollectionViewLayoutAttributes *cellattr =
     [itemAttributes objectForKey:[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
     attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, 100, 100);
@@ -175,17 +174,14 @@ Boolean needSetup = true;
 
 // Layout Attribute for Supplementary View (the time header and the channel header).
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)kind
-                                                                     atIndexPath:
-                                                                         (NSIndexPath *)indexPath {
+                                                                     atIndexPath: (NSIndexPath *)indexPath {
   UICollectionViewLayoutAttributes *attributes =
       [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind
                                                                      withIndexPath:indexPath];
   if ([kind isEqualToString:timeCellKind]) {
     CGFloat widthPerHalfHour = kHalfHourWidth;
     CGFloat paddingSize = kThumbnailSize * kHalfHourWidth;
-    attributes.frame =
-        CGRectMake(kChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0,
-                   widthPerHalfHour, kHourHeaderHeight);
+    attributes.frame = CGRectMake(kChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, kHourHeaderHeight);
   } else if ([kind isEqualToString:stationCellKind]) {
     NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
 
@@ -193,7 +189,7 @@ Boolean needSetup = true;
     UICollectionViewLayoutAttributes *attr = [itemAttributes objectForKey:channelIndex];
     attributes.frame = CGRectMake(0, attr.frame.origin.y, kChannelHeaderWidth, kChannelHeaderHeight);
   } else if ([kind isEqualToString:timeIndicatorKind]) {
-    NSDate *timeAtFront = [timeArray objectAtIndex:0]; 
+    NSDate *timeAtFront = timeArray[0];
     CGFloat currentTimeMarker =
         [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront] /
         (60 * 30.) * kHalfHourWidth;
@@ -203,12 +199,13 @@ Boolean needSetup = true;
   return attributes;
 }
 
+// Return z index for the type of cells.
 - (CGFloat)zIndexForElementKind:(NSString *)elementKind{
   if ([elementKind isEqualToString:timeIndicatorKind]){
     return 10;
-  }else if([elementKind isEqualToString:stationCellKind]){
+  } else if([elementKind isEqualToString:stationCellKind]){
     return 20;
-  }else if([elementKind isEqualToString:timeCellKind]){
+  } else if([elementKind isEqualToString:timeCellKind]){
     return 30;
   }
   return 1;
