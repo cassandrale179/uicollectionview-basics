@@ -71,13 +71,6 @@
 }
 
 #pragma mark --------- HEADER METHOD ---------
-// Set a size for the header file first
-- (CGSize)collectionView:(UICollectionView *)collectionView
-                  layout:(UICollectionViewLayout *)collectionViewLayout
-referenceSizeForHeaderInSection:(NSInteger)section {
-  return CGSizeMake(60.0f, 60.0f);
-}
-
 // Return how many rows within UI Collection View
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
   NSInteger row = [epg.stations count];
