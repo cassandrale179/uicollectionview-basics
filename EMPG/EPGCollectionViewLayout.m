@@ -1,22 +1,24 @@
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
 
-@implementation EPGCollectionViewLayout{
-// Dictionary for cell types and time array
-  NSMutableDictionary *itemAttributes;
-  NSMutableDictionary *channelAttributes;
-  NSMutableDictionary *hourAttrDict;
-  NSMutableArray *timeArray;
+@implementation EPGCollectionViewLayout {
+  // Dictionary for cell types and time array
+  NSMutableDictionary *_itemAttributes;
+  NSMutableDictionary *_channelAttributes;
+  NSMutableDictionary *_hourAttributes;
+  NSMutableArray *_timeArray;
+  EPGRenderer *_epg;
+  CGSize _contentSize;
 }
 
 // Measurement constants
-CGFloat const kCellHeight = 100;
-CGFloat const kHalfHourWidth = 400;
+static const CGFloat kCellHeight = 100;
+static const CGFloat kHalfHourWidth = 400;
 
 // Constants for views
-NSString *timeIndicatorKind = @"TimeIndicatorView";
-NSString *timeCellKind = @"HourHeaderView";
-NSString *stationCellKind = @"ChannelHeaderView";
+static const NSString *kTimeIndicatorKind = @"TimeIndicatorView";
+static const NSString *kTimeCellKind = @"HourHeaderView";
+static const NSString *kStationCellKind = @"ChannelHeaderView";
 
 // Constants for supplementary view
 static const CGFloat kHourHeaderHeight = 40;      // height of each time cell
@@ -26,114 +28,136 @@ static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
 static const CGFloat topOfIndicator = 20;         // space between screen and tip of time indicator
 
 // Other attributes
-EPGRenderer *epg;
-CGSize contentSize;
-Boolean needSetup = true;
 
-#pragma mark Prepare Layout Method
+BOOL needSetup = YES;
+
+#pragma mark Prepare Layout
 // Return content size.
 - (CGSize)collectionViewContentSize {
-  return contentSize;
+  return _contentSize;
 }
 
 - (void)prepareLayout {
   // Calculating the bounds (origin x and y) of the cells.
   if (needSetup) {
-    epg = [DataModel createEPG];
-    timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
+    _epg = [DataModel createEPG];
+    _timeArray = [DataModel calculateEPGTime:_epg timeInterval:kAiringIntervalMinutes];
     needSetup = false;
   }
+
+  // setting the frame for the various cells
+  [self setAttributesForTimeHeaders];
+  [self setAttributesForEPGCells];
+  [self setAttributesForChannelCells];
+}
+
+- (void)setAttributesForTimeHeaders {
   // Create attributes for the Hour Header.
   NSArray *hourHeaderViewIndexPaths = [self indexPathsOfHourHeaderViews];
-  hourAttrDict = [[NSMutableDictionary alloc] init];
+  _hourAttributes = [[NSMutableDictionary alloc] init];
   for (NSIndexPath *indexPath in hourHeaderViewIndexPaths) {
     UICollectionViewLayoutAttributes *attributes =
-    [self layoutAttributesForSupplementaryViewOfKind:timeCellKind atIndexPath:indexPath];
-    
+        [self layoutAttributesForSupplementaryViewOfKind:kTimeCellKind atIndexPath:indexPath];
+
     // Make the hour header pin to the top when scrolling vertically.
     CGFloat yOffSet = self.collectionView.contentOffset.y;
     CGPoint origin = attributes.frame.origin;
     origin.y = yOffSet;
     attributes.frame = (CGRect){.origin = origin, .size = attributes.frame.size};
-    attributes.zIndex = [self zIndexForElementKind:timeCellKind];
-    hourAttrDict[indexPath] = attributes;
+    attributes.zIndex = [self zIndexForElementKind:kTimeCellKind];
+    _hourAttributes[indexPath] = attributes;
   }
-  
+}
+
+- (void)setAttributesForEPGCells {
   // Create attributes for the Airing Cells.
   CGFloat xMax = 0;
-  itemAttributes = [[NSMutableDictionary alloc] init];
+  _itemAttributes = [[NSMutableDictionary alloc] init];
   if (self.collectionView.numberOfSections > 0) {
-    for (NSInteger section = 0; section < self.collectionView.numberOfSections; section++) {
+    for (NSUInteger section = 0; section < self.collectionView.numberOfSections; section++) {
       if ([self.collectionView numberOfItemsInSection:section] > 0) {
         CGFloat xPos = kChannelHeaderWidth;
         CGFloat yPos = kVerticalPadding + section * kCellHeight + kBorderPadding * section;
         CGFloat numHalfHourIntervals;
-        
+
         // Calculate the frame of each airing cell.
-        for (NSInteger item = 0; item < [self.collectionView numberOfItemsInSection:section]; item++) {
+        for (NSUInteger item = 0; item < [self.collectionView numberOfItemsInSection:section];
+             item++) {
           NSIndexPath *cellIndex = [NSIndexPath indexPathForItem:item inSection:section];
           UICollectionViewLayoutAttributes *attr;
-          
+
           // If the cell is not a thumbnail
           if (item != 0) {
-            
             // Subtract 1 to account for the thumbnail cell at item index 0.
-            AiringRenderer *currentAiring = epg.stations[section].airings[item - 1];
-            
-            // For first airing cell in case the show started before the first time in the time header cells.
-            NSDate *closerStartTime = timeArray[0];
-            if ([closerStartTime earlierDate:currentAiring.airingStartTime]){
+            AiringRenderer *currentAiring = _epg.stations[section].airings[item - 1];
+
+            // For first airing cell in case the show started before the first time in the time
+            // header cells.
+            NSDate *closerStartTime = _timeArray[0];
+            if ([closerStartTime earlierDate:currentAiring.airingStartTime]) {
               closerStartTime = currentAiring.airingStartTime;
             }
-            NSInteger closestTimeIndex =[timeArray indexOfObject:currentAiring.airingStartTime inSortedRange:NSMakeRange(0, timeArray.count) options:NSBinarySearchingInsertionIndex usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2){
-              return [time1 compare:time2];
-            }]-1;
-            UICollectionViewLayoutAttributes *hourAttributes = hourAttrDict[[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
-            xPos = [closerStartTime timeIntervalSinceDate:timeArray[closestTimeIndex]] /
-            (kAiringIntervalMinutes * 60.)*kHalfHourWidth + hourAttributes.frame.origin.x;
-            numHalfHourIntervals = [currentAiring.airingEndTime
-                                    timeIntervalSinceDate:closerStartTime] / (kAiringIntervalMinutes * 60.);
-            attr = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
+            NSInteger closestTimeIndex =
+                [_timeArray indexOfObject:currentAiring.airingStartTime
+                            inSortedRange:NSMakeRange(0, _timeArray.count)
+                                  options:NSBinarySearchingInsertionIndex
+                          usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2) {
+                            return [time1 compare:time2];
+                          }] -
+                1;
+            UICollectionViewLayoutAttributes *hourAttributes =
+                _hourAttributes[[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
+            xPos = [closerStartTime timeIntervalSinceDate:_timeArray[closestTimeIndex]] /
+                       (kAiringIntervalMinutes * 60.) * kHalfHourWidth +
+                   hourAttributes.frame.origin.x;
+            numHalfHourIntervals =
+                [currentAiring.airingEndTime timeIntervalSinceDate:closerStartTime] /
+                (kAiringIntervalMinutes * 60.);
+            attr =
+                [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           } else {
             // Set constant for the size of the thumbnail.
             numHalfHourIntervals = kThumbnailSize;
             attr =
-            [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
+                [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           }
           attr.frame = CGRectMake(xPos, yPos, numHalfHourIntervals * kHalfHourWidth, kCellHeight);
-          itemAttributes[cellIndex] = attr;
+          _itemAttributes[cellIndex] = attr;
         }
-        xMax = MAX(xMax, xPos+numHalfHourIntervals * kHalfHourWidth);
+        xMax = MAX(xMax, xPos + numHalfHourIntervals * kHalfHourWidth);
       }
-      
+
       // Return total content size of all cells within it.
       CGFloat contentWidth = xMax;
-      CGFloat contentHeight = [self.collectionView numberOfSections] * (kCellHeight + kBorderPadding) + kVerticalPadding;
-      contentSize = CGSizeMake(contentWidth, contentHeight);
+      CGFloat contentHeight =
+          [self.collectionView numberOfSections] * (kCellHeight + kBorderPadding) +
+          kVerticalPadding;
+      _contentSize = CGSizeMake(contentWidth, contentHeight);
     }
   }
-  
+}
+
+- (void)setAttributesForChannelCells {
   // Create attributes for the Channel Header.
   NSArray *channelHeaderIndexPaths = [self indexPathsOfChannelHeaderViews];
-  channelAttributes = [[NSMutableDictionary alloc] init];
+  _channelAttributes = [[NSMutableDictionary alloc] init];
   for (NSIndexPath *indexPath in channelHeaderIndexPaths) {
     UICollectionViewLayoutAttributes *attributes =
-    [self layoutAttributesForSupplementaryViewOfKind:stationCellKind
-                                         atIndexPath:indexPath];
-    
+        [self layoutAttributesForSupplementaryViewOfKind:kStationCellKind atIndexPath:indexPath];
+
     // Make the network header pin to the left when scrolling horizontally.
     CGFloat xOffset = self.collectionView.contentOffset.x;
     CGPoint origin = attributes.frame.origin;
     origin.x = xOffset;
-    attributes.zIndex = [self zIndexForElementKind:stationCellKind];
-    
+    attributes.zIndex = [self zIndexForElementKind:kStationCellKind];
+
     // Get attributes of the airing cells to vertically align the channel and airing cells.
-    UICollectionViewLayoutAttributes *cellattr = itemAttributes[[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
+    UICollectionViewLayoutAttributes *cellattr =
+        _itemAttributes[[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
     attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, 100, 100);
-    channelAttributes[indexPath] = attributes;
+    _channelAttributes[indexPath] = attributes;
   }
 }
-  
 
 #pragma mark Layout Attribute for Element in Rect and Supplementary View
 // Return the frame for each cell (333.333 0; 200 100).
@@ -141,20 +165,20 @@ Boolean needSetup = true;
   NSMutableArray *attributesInRect = [[NSMutableArray alloc] init];
 
   // Add all the attributes to attributesInRect (the entire view).
-  for (NSIndexPath *indexPath in itemAttributes) {
-    UICollectionViewLayoutAttributes *attributes = itemAttributes[indexPath];
+  for (NSIndexPath *indexPath in _itemAttributes) {
+    UICollectionViewLayoutAttributes *attributes = _itemAttributes[indexPath];
     if (CGRectIntersectsRect(rect, attributes.frame)) {
       [attributesInRect addObject:attributes];
     }
   }
-  for (NSIndexPath *indexPath in channelAttributes) {
-    UICollectionViewLayoutAttributes *attributes = channelAttributes[indexPath];
+  for (NSIndexPath *indexPath in _channelAttributes) {
+    UICollectionViewLayoutAttributes *attributes = _channelAttributes[indexPath];
     if (CGRectIntersectsRect(rect, attributes.frame)) {
       [attributesInRect addObject:attributes];
     }
   }
-  for (NSIndexPath *indexPath in hourAttrDict) {
-    UICollectionViewLayoutAttributes *attributes = hourAttrDict[indexPath];
+  for (NSIndexPath *indexPath in _hourAttributes) {
+    UICollectionViewLayoutAttributes *attributes = _hourAttributes[indexPath];
     if (CGRectIntersectsRect(rect, attributes.frame)) {
       [attributesInRect addObject:attributes];
     }
@@ -162,7 +186,7 @@ Boolean needSetup = true;
 
   // Supplementary view for time indicator cell.
   UICollectionViewLayoutAttributes *attributes = [self
-      layoutAttributesForSupplementaryViewOfKind:@"TimeIndicatorView"
+      layoutAttributesForSupplementaryViewOfKind:kTimeIndicatorKind
                                      atIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]];
   [attributesInRect addObject:attributes];
   return attributesInRect;
@@ -170,38 +194,42 @@ Boolean needSetup = true;
 
 // Layout Attribute for Supplementary View (the time header and the channel header).
 - (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)kind
-                                                                     atIndexPath: (NSIndexPath *)indexPath {
+                                                                     atIndexPath:
+                                                                         (NSIndexPath *)indexPath {
   UICollectionViewLayoutAttributes *attributes =
       [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:kind
                                                                      withIndexPath:indexPath];
-  if ([kind isEqualToString:timeCellKind]) {
+  if ([kind isEqualToString:kTimeCellKind]) {
     CGFloat widthPerHalfHour = kHalfHourWidth;
     CGFloat paddingSize = kThumbnailSize * kHalfHourWidth;
-    attributes.frame = CGRectMake(kChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0, widthPerHalfHour, kHourHeaderHeight);
-  } else if ([kind isEqualToString:stationCellKind]) {
+    attributes.frame =
+        CGRectMake(kChannelHeaderWidth + paddingSize + (widthPerHalfHour * indexPath.item), 0,
+                   widthPerHalfHour, kHourHeaderHeight);
+  } else if ([kind isEqualToString:kStationCellKind]) {
     NSIndexPath *channelIndex = [NSIndexPath indexPathForItem:0 inSection:indexPath.section];
 
     // Find frame of the airing cell as reference.
-    UICollectionViewLayoutAttributes *attr = itemAttributes[channelIndex];
-    attributes.frame = CGRectMake(0, attr.frame.origin.y, kChannelHeaderWidth, kChannelHeaderHeight);
-  } else if ([kind isEqualToString:timeIndicatorKind]) {
-    NSDate *timeAtFront = timeArray[0];
+    UICollectionViewLayoutAttributes *attr = _itemAttributes[channelIndex];
+    attributes.frame =
+        CGRectMake(0, attr.frame.origin.y, kChannelHeaderWidth, kChannelHeaderHeight);
+  } else if ([kind isEqualToString:kTimeIndicatorKind]) {
+    NSDate *timeAtFront = _timeArray[0];
     CGFloat currentTimeMarker =
         [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront] /
         (60 * 30.) * kHalfHourWidth;
-    attributes.frame = CGRectMake(currentTimeMarker, topOfIndicator, 2, contentSize.height);
-    attributes.zIndex = [self zIndexForElementKind:timeIndicatorKind];
+    attributes.frame = CGRectMake(currentTimeMarker, topOfIndicator, 2, _contentSize.height);
+    attributes.zIndex = [self zIndexForElementKind:kTimeIndicatorKind];
   }
   return attributes;
 }
 
 // Return z index for the type of cells.
-- (CGFloat)zIndexForElementKind:(NSString *)elementKind{
-  if ([elementKind isEqualToString:timeIndicatorKind]){
+- (CGFloat)zIndexForElementKind:(NSString *)elementKind {
+  if ([elementKind isEqualToString:kTimeIndicatorKind]) {
     return 10;
-  } else if([elementKind isEqualToString:stationCellKind]){
+  } else if ([elementKind isEqualToString:kStationCellKind]) {
     return 20;
-  } else if([elementKind isEqualToString:timeCellKind]){
+  } else if ([elementKind isEqualToString:kTimeCellKind]) {
     return 30;
   }
   return 1;
@@ -211,7 +239,7 @@ Boolean needSetup = true;
 // Return an array of all the index paths for the hour.
 - (NSArray *)indexPathsOfHourHeaderViews {
   NSMutableArray *indexPaths = [NSMutableArray array];
-  for (NSInteger hourIndex = 0; hourIndex < timeArray.count; hourIndex++) {
+  for (NSInteger hourIndex = 0; hourIndex < _timeArray.count; hourIndex++) {
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:hourIndex inSection:0];
     [indexPaths addObject:indexPath];
   }
@@ -221,13 +249,13 @@ Boolean needSetup = true;
 #pragma mark Methodfor Station Column VIew
 // Calculate the Y Coordinate of each channel.
 - (NSInteger)channelIndexFromYCoordinate:(CGFloat)yPosition {
-  return epg.stations.count;
+  return _epg.stations.count;
 }
 
 // Return index path for the stations.
 - (NSArray *)indexPathsOfChannelHeaderViews {
   NSInteger minChannelIndex = 0;
-  NSInteger maxChannelIndex = epg.stations.count - 1;
+  NSInteger maxChannelIndex = _epg.stations.count - 1;
   NSMutableArray *indexPaths = [NSMutableArray array];
   for (NSInteger idx = minChannelIndex; idx <= maxChannelIndex; idx++) {
     // changed rev indexpath and section.
@@ -239,7 +267,7 @@ Boolean needSetup = true;
 
 #pragma mark Helper methods
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
-  return itemAttributes[indexPath];
+  return _itemAttributes[indexPath];
 }
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {
