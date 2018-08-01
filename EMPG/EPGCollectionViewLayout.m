@@ -1,5 +1,6 @@
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
+#import "ViewController.h"
 
 @implementation EPGCollectionViewLayout {
   // Dictionary for cell types and time array
@@ -7,7 +8,6 @@
   NSMutableDictionary *_channelAttributes;
   NSMutableDictionary *_hourAttributes;
   NSMutableArray *_timeArray;
-  EPGRenderer *_epg;
   CGSize _contentSize;
 }
 
@@ -29,7 +29,10 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 
 // Other attributes
 
-BOOL needSetup = YES;
+// BOOL needSetup = YES;
+- (void)initWithDelegate:(id<EPGDataSourceDelegate>)dataSourceDelegate {
+  _dataSource = dataSourceDelegate;
+}
 
 #pragma mark Prepare Layout
 // Return content size.
@@ -37,13 +40,9 @@ BOOL needSetup = YES;
   return _contentSize;
 }
 
+// Calculating the bounds (origin x and y) of the cells.
 - (void)prepareLayout {
-  // Calculating the bounds (origin x and y) of the cells.
-  if (needSetup) {
-    _epg = [DataModel createEPG];
-    _timeArray = [DataModel calculateEPGTime:_epg timeInterval:kAiringIntervalMinutes];
-    needSetup = false;
-  }
+  _timeArray = [_dataSource epgTimeArrayForLayout:self];
 
   // setting the frame for the various cells
   [self setAttributesForTimeHeaders];
@@ -89,16 +88,17 @@ BOOL needSetup = YES;
           // If the cell is not a thumbnail
           if (item != 0) {
             // Subtract 1 to account for the thumbnail cell at item index 0.
-            AiringRenderer *currentAiring = _epg.stations[section].airings[item - 1];
+            NSDate *currentAiringStartTime = [_dataSource layout:self
+                                     startTimeForItemAtIndexPath:cellIndex];
 
             // For first airing cell in case the show started before the first time in the time
             // header cells.
             NSDate *closerStartTime = _timeArray[0];
-            if ([closerStartTime earlierDate:currentAiring.airingStartTime]) {
-              closerStartTime = currentAiring.airingStartTime;
+            if ([closerStartTime earlierDate:currentAiringStartTime]) {
+              closerStartTime = currentAiringStartTime;
             }
             NSInteger closestTimeIndex =
-                [_timeArray indexOfObject:currentAiring.airingStartTime
+                [_timeArray indexOfObject:currentAiringStartTime
                             inSortedRange:NSMakeRange(0, _timeArray.count)
                                   options:NSBinarySearchingInsertionIndex
                           usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2) {
@@ -110,9 +110,10 @@ BOOL needSetup = YES;
             xPos = [closerStartTime timeIntervalSinceDate:_timeArray[closestTimeIndex]] /
                        (kAiringIntervalMinutes * 60.) * kHalfHourWidth +
                    hourAttributes.frame.origin.x;
-            numHalfHourIntervals =
-                [currentAiring.airingEndTime timeIntervalSinceDate:closerStartTime] /
-                (kAiringIntervalMinutes * 60.);
+            NSDate *currentAiringEndTime = [_dataSource layout:self
+                                     EndTimeForItemAtIndexPath:cellIndex];
+            numHalfHourIntervals = [currentAiringEndTime timeIntervalSinceDate:closerStartTime] /
+                                   (kAiringIntervalMinutes * 60.);
             attr =
                 [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           } else {
@@ -247,18 +248,13 @@ BOOL needSetup = YES;
 }
 
 #pragma mark Methodfor Station Column VIew
-// Calculate the Y Coordinate of each channel.
-- (NSInteger)channelIndexFromYCoordinate:(CGFloat)yPosition {
-  return _epg.stations.count;
-}
 
 // Return index path for the stations.
 - (NSArray *)indexPathsOfChannelHeaderViews {
   NSInteger minChannelIndex = 0;
-  NSInteger maxChannelIndex = _epg.stations.count - 1;
+  NSInteger maxChannelIndex = [_dataSource epgStationCountForLayout:self];
   NSMutableArray *indexPaths = [NSMutableArray array];
-  for (NSInteger idx = minChannelIndex; idx <= maxChannelIndex; idx++) {
-    // changed rev indexpath and section.
+  for (NSInteger idx = minChannelIndex; idx < maxChannelIndex; idx++) {
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:idx];
     [indexPaths addObject:indexPath];
   }
