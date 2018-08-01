@@ -91,29 +91,15 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
             NSDate *currentAiringStartTime = [_dataSource layout:self
                                      startTimeForItemAtIndexPath:cellIndex];
 
-            // For first airing cell in case the show started before the first time in the time
-            // header cells.
+            // For first airing cell in case the show started before the first time in the time header cells.
             NSDate *closerStartTime = _timeArray[0];
             if ([closerStartTime earlierDate:currentAiringStartTime]) {
               closerStartTime = currentAiringStartTime;
             }
-            NSInteger closestTimeIndex =
-                [_timeArray indexOfObject:currentAiringStartTime
-                            inSortedRange:NSMakeRange(0, _timeArray.count)
-                                  options:NSBinarySearchingInsertionIndex
-                          usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2) {
-                            return [time1 compare:time2];
-                          }] -
-                1;
-            UICollectionViewLayoutAttributes *hourAttributes =
-                _hourAttributes[[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
-            xPos = [closerStartTime timeIntervalSinceDate:_timeArray[closestTimeIndex]] /
-                       (kAiringIntervalMinutes * 60.) * kHalfHourWidth +
-                   hourAttributes.frame.origin.x;
+            xPos = [self startingXPosition:closerStartTime];
             NSDate *currentAiringEndTime = [_dataSource layout:self
                                      EndTimeForItemAtIndexPath:cellIndex];
-            numHalfHourIntervals = [currentAiringEndTime timeIntervalSinceDate:closerStartTime] /
-                                   (kAiringIntervalMinutes * 60.);
+            numHalfHourIntervals = [self numOfHalfHourIntervals:currentAiringStartTime withEndTime:currentAiringEndTime];
             attr =
                 [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           } else {
@@ -158,6 +144,27 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
     attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, 100, 100);
     _channelAttributes[indexPath] = attributes;
   }
+}
+
+#pragma mark Airing Cell Calculations
+// Return the factor by which the standard cell width should be multipled, given a certain duration
+-(CGFloat)numOfHalfHourIntervals:(NSDate *)airingStartTime withEndTime:(NSDate *)airingEndTime{
+  return [airingEndTime timeIntervalSinceDate:airingStartTime] / (kAiringIntervalMinutes * 60.) ;
+}
+
+//Return the x position that the airing cell should start at in relation to the header time cells
+-(CGFloat) startingXPosition:(NSDate *)airingStartTime{
+  NSInteger closestTimeIndex =
+  [_timeArray indexOfObject:airingStartTime
+              inSortedRange:NSMakeRange(0, _timeArray.count)
+                    options:NSBinarySearchingInsertionIndex
+            usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2) {
+              return [time1 compare:time2];
+            }] - 1;
+  UICollectionViewLayoutAttributes *hourAttributes = _hourAttributes[[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
+  return [airingStartTime timeIntervalSinceDate:_timeArray[closestTimeIndex]] /
+  (kAiringIntervalMinutes * 60.) * kHalfHourWidth +
+  hourAttributes.frame.origin.x;
 }
 
 #pragma mark Layout Attribute for Element in Rect and Supplementary View
