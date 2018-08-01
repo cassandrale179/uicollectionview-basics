@@ -26,7 +26,6 @@
 @end
 // Implementation of the View Controller
 @implementation ViewController
-
 - (void)viewDidLoad {
   [super viewDidLoad];
   
@@ -40,9 +39,10 @@
   timeCellIdentifier = NSStringFromClass([TimeCell class]);
   stationCellIdentifier = NSStringFromClass([StationCell class]);
   
+  
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
-  
+  [viewLayout initWithDelegate:self];
   // Create an epg object
   epg = [DataModel createEPG];
   timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
@@ -70,7 +70,8 @@
   collectionView.directionalLockEnabled = true;
 }
 
-#pragma mark --------- HEADER METHOD ---------
+#pragma mark UICollectionDataSource
+
 // Return how many rows within UI Collection View
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView{
   NSInteger row = [epg.stations count];
@@ -89,7 +90,6 @@
 // For each cell in the index path, put information inside the cell
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
   EPGCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"epgCell" forIndexPath:indexPath];
-  
   //set the content of each cell
   if(indexPath.item!=0){
     [cell setup:epg.stations[indexPath.section].airings[indexPath.item-1].airingTitle withDescription:@"sampledescription"];
@@ -99,8 +99,27 @@
   return cell;
 }
 
+#pragma mark EPGDataSourceDelegate
 
-#pragma mark ---------  METHODS FOR SUPPLEMENTARY VIEW ---------
+-(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout startTimeForItemAtIndexPath:(NSIndexPath *)indexPath{
+
+  //item-1 to account for the first video cell
+  return epg.stations[indexPath.section].airings[indexPath.item-1].airingStartTime;
+}
+-(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout EndTimeForItemAtIndexPath:(NSIndexPath *)indexPath{
+
+  //item-1 to account for the first video cell
+  return epg.stations[indexPath.section].airings[indexPath.item-1].airingEndTime;
+}
+-(NSArray *)epgTimeArrayForLayout:(EPGCollectionViewLayout *)epgLayout{
+  return timeArray;
+}
+
+- (NSInteger)epgStationCountForLayout:(EPGCollectionViewLayout *)epgLayout{
+  return epg.stations.count;
+}
+
+#pragma mark METHODS FOR SUPPLEMENTARY VIEW
 // Dequeue method for time cell, time line cell, and station cell
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
