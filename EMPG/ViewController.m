@@ -9,7 +9,6 @@
 // Interface of the View Controller
 @interface ViewController (){
   UICollectionView *collectionView;
-  UICollectionViewFlowLayout *flowLayout;
   NSMutableArray *_timeArray;
   EPGRenderer *epg;
   

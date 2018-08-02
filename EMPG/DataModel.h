@@ -84,11 +84,13 @@
 
 /** Creates the sample data used in the EPG. */
 + (EPGRenderer *)createEPG;
++ (EPGRenderer *)createEPG2;
+
 
 /** Finds the start and end time of the First and Last airing respectively.
  *
  * @param epgObject The EPG containing all of the sample data.
- * @param timeInterval The number of minutes we should space out the time cell headers.
+ * @param time The number of minutes we should space out the time cell headers.
  * @return NSMutableArray of NSDates spaced timeInterval apart starting and ending with the startTime and endTime of the EPG.
  */
 + (NSMutableArray *) calculateEPGTime:(EPGRenderer *)epgObject timeInterval:(NSInteger)time;
