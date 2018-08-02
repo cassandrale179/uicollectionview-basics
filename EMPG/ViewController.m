@@ -6,7 +6,6 @@
 #import "EPGCollectionViewLayout.h"
 #import "DataModel.h"
 
-
 // Interface of the View Controller
 @interface ViewController () <UICollectionViewDelegateFlowLayout>{
   UICollectionView *collectionView;
@@ -24,6 +23,7 @@
   
 }
 @end
+
 // Implementation of the View Controller
 @implementation ViewController
 - (void)viewDidLoad {
@@ -39,10 +39,10 @@
   timeCellIdentifier = NSStringFromClass([TimeCell class]);
   stationCellIdentifier = NSStringFromClass([StationCell class]);
   
-  
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   [viewLayout initWithDelegate:self];
+  
   // Create an epg object
   epg = [DataModel createEPG];
   _timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
@@ -158,8 +158,8 @@
     [timeCell setup: [_timeArray objectAtIndex: indexPath.item]];
     return timeCell;
   }
-  else if ([kind isEqualToString:@"ChannelHeaderView"]){
-    StationCell *stationCell  = [collectionView dequeueReusableSupplementaryViewOfKind: @"ChannelHeaderView" withReuseIdentifier:stationCellIdentifier forIndexPath:indexPath];
+  else if ([kind isEqualToString:stationCellKind]){
+    StationCell *stationCell  = [collectionView dequeueReusableSupplementaryViewOfKind: stationCellKind withReuseIdentifier:stationCellIdentifier forIndexPath:indexPath];
     [stationCell setup: epg.stations[indexPath.section].stationName];
     return stationCell;
   }
