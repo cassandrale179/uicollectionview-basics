@@ -7,7 +7,7 @@
   NSMutableDictionary *_itemAttributes;
   NSMutableDictionary *_channelAttributes;
   NSMutableDictionary *_hourAttributes;
-  NSMutableArray *_timeArray;
+ // NSMutableArray *_timeArray;
   CGSize _contentSize;
 }
 
@@ -42,7 +42,7 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 
 // Calculating the bounds (origin x and y) of the cells.
 - (void)prepareLayout {
-  _timeArray = [_dataSource epgTimeArrayForLayout:self];
+  //_timeArray = [_dataSource epgTimeArrayForLayout:self];
 
   // setting the frame for the various cells
   [self setAttributesForTimeHeaders];
@@ -87,16 +87,8 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 
           // If the cell is not a thumbnail
           if (item != 0) {
-            // Subtract 1 to account for the thumbnail cell at item index 0.
-            NSDate *currentAiringStartTime = [_dataSource layout:self
-                                     startTimeForItemAtIndexPath:cellIndex];
-
-            // For first airing cell in case the show started before the first time in the time header cells.
-            NSDate *closerStartTime = _timeArray[0];
-            if ([closerStartTime earlierDate:currentAiringStartTime]) {
-              closerStartTime = currentAiringStartTime;
-            }
-            xPos = [self startingXPosition:closerStartTime];
+            NSDate *currentAiringStartTime = [_dataSource layout:self startTimeForItemAtIndexPath:cellIndex];
+            xPos = [self startingXPositionForAiring:currentAiringStartTime withIndexPath:cellIndex];
             NSDate *currentAiringEndTime = [_dataSource layout:self
                                      EndTimeForItemAtIndexPath:cellIndex];
             numHalfHourIntervals = [self numOfHalfHourIntervals:currentAiringStartTime withEndTime:currentAiringEndTime];
@@ -153,16 +145,10 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 }
 
 //Return the x position that the airing cell should start at in relation to the header time cells
--(CGFloat) startingXPosition:(NSDate *)airingStartTime{
-  NSInteger closestTimeIndex =
-  [_timeArray indexOfObject:airingStartTime
-              inSortedRange:NSMakeRange(0, _timeArray.count)
-                    options:NSBinarySearchingInsertionIndex
-            usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2) {
-              return [time1 compare:time2];
-            }] - 1;
+-(CGFloat) startingXPositionForAiring:(NSDate *)airingStartTime withIndexPath:(NSIndexPath *)indexPath{
+  NSInteger closestTimeIndex = [_dataSource layoutBinarySearchForTime:self forItemAtIndexPath:indexPath];
   UICollectionViewLayoutAttributes *hourAttributes = _hourAttributes[[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
-  return [airingStartTime timeIntervalSinceDate:_timeArray[closestTimeIndex]] /
+  return [_dataSource layoutTimeIntervalBeforeAiring:self withClosestTimeIndex:closestTimeIndex withAiringStartTime:airingStartTime]/
   (kAiringIntervalMinutes * 60.) * kHalfHourWidth +
   hourAttributes.frame.origin.x;
 }
@@ -221,7 +207,7 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
     attributes.frame =
         CGRectMake(0, attr.frame.origin.y, kChannelHeaderWidth, kChannelHeaderHeight);
   } else if ([kind isEqualToString:kTimeIndicatorKind]) {
-    NSDate *timeAtFront = _timeArray[0];
+    NSDate *timeAtFront = [_dataSource layoutStartTimeForEPG:self];
     CGFloat currentTimeMarker =
         [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront] /
         (60 * 30.) * kHalfHourWidth;
@@ -247,7 +233,8 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 // Return an array of all the index paths for the hour.
 - (NSArray *)indexPathsOfHourHeaderViews {
   NSMutableArray *indexPaths = [NSMutableArray array];
-  for (NSInteger hourIndex = 0; hourIndex < _timeArray.count; hourIndex++) {
+  NSInteger timeCellCount = [_dataSource epgTimeArrayCountForLayout:self];
+  for (NSInteger hourIndex = 0; hourIndex < timeCellCount; hourIndex++) {
     NSIndexPath *indexPath = [NSIndexPath indexPathForItem:hourIndex inSection:0];
     [indexPaths addObject:indexPath];
   }
