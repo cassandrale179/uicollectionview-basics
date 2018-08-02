@@ -19,6 +19,7 @@
 		606F00E220FEAF9F00DCD67E /* EPGCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00DC20FEAF9F00DCD67E /* EPGCollectionViewCell.m */; };
 		606F00E320FEAF9F00DCD67E /* EPGCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */; };
 		606F00E420FEAF9F00DCD67E /* DataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00E120FEAF9F00DCD67E /* DataModel.m */; };
+		60F0990E211379D300E33A94 /* EPGCollectionViewLayoutTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F0990D211379D300E33A94 /* EPGCollectionViewLayoutTest.m */; };
 		982C7123210264950065DE8A /* TimeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 982C7121210264940065DE8A /* TimeCell.m */; };
 		982C712621029AF90065DE8A /* TimeIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 982C712521029AF90065DE8A /* TimeIndicatorCell.m */; };
 		982C712C210653280065DE8A /* StationCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 982C712B210653280065DE8A /* StationCell.m */; };
@@ -64,6 +65,7 @@
 		606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EPGCollectionViewLayout.m; sourceTree = "<group>"; };
 		606F00E020FEAF9F00DCD67E /* EPGCollectionViewLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EPGCollectionViewLayout.h; sourceTree = "<group>"; };
 		606F00E120FEAF9F00DCD67E /* DataModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataModel.m; sourceTree = "<group>"; };
+		60F0990D211379D300E33A94 /* EPGCollectionViewLayoutTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EPGCollectionViewLayoutTest.m; sourceTree = "<group>"; };
 		982C7121210264940065DE8A /* TimeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeCell.m; sourceTree = "<group>"; };
 		982C7122210264950065DE8A /* TimeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeCell.h; sourceTree = "<group>"; };
 		982C712421029AF90065DE8A /* TimeIndicatorCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimeIndicatorCell.h; sourceTree = "<group>"; };
@@ -128,6 +130,7 @@
 				606F00DC20FEAF9F00DCD67E /* EPGCollectionViewCell.m */,
 				606F00E020FEAF9F00DCD67E /* EPGCollectionViewLayout.h */,
 				606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */,
+				60F0990D211379D300E33A94 /* EPGCollectionViewLayoutTest.m */,
 				982C712A210653280065DE8A /* StationCell.h */,
 				982C712B210653280065DE8A /* StationCell.m */,
 				601833CE20FD717800F94150 /* AppDelegate.h */,
@@ -311,6 +314,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				601833E820FD717A00F94150 /* EMPGTests.m in Sources */,
+				60F0990E211379D300E33A94 /* EPGCollectionViewLayoutTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
