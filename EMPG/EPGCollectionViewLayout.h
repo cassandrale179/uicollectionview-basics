@@ -13,7 +13,10 @@ extern CGFloat const kAiringIntervalMinutes = 30;
 @end
 @protocol EPGDataSourceDelegate <NSObject>
 -(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout startTimeForItemAtIndexPath:(NSIndexPath *)indexPath;
+-(NSDate *)layoutStartTimeForEPG:(EPGCollectionViewLayout *)epgLayout;
+-(NSInteger *)layoutBinarySearchForTime:(EPGCollectionViewLayout *)epgLayout forItemAtIndexPath:(NSIndexPath *)indexPath;
 -(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout EndTimeForItemAtIndexPath:(NSIndexPath *)indexPath;
--(NSArray *)epgTimeArrayForLayout:(EPGCollectionViewLayout *)epgLayout;
+-(NSInteger *)epgTimeArrayCountForLayout:(EPGCollectionViewLayout *)epgLayout;
 -(NSInteger) epgStationCountForLayout: (EPGCollectionViewLayout *) epgLayout;
+-(NSTimeInterval)layoutTimeIntervalBeforeAiring:(EPGCollectionViewLayout *)epgLayout withClosestTimeIndex:(NSInteger)closestTimeIndex withAiringStartTime:(NSDate *)startTime;
 @end
