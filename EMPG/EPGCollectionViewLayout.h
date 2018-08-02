@@ -12,11 +12,18 @@ extern CGFloat const kAiringIntervalMinutes = 30;
 -(void)initWithDelegate:(id<EPGDataSourceDelegate>)dataSourceDelegate;
 @end
 @protocol EPGDataSourceDelegate <NSObject>
+// Return start time for airing cell
 -(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout startTimeForItemAtIndexPath:(NSIndexPath *)indexPath;
--(NSDate *)layoutStartTimeForEPG:(EPGCollectionViewLayout *)epgLayout;
--(NSInteger *)layoutBinarySearchForTime:(EPGCollectionViewLayout *)epgLayout forItemAtIndexPath:(NSIndexPath *)indexPath;
+// Return end time for an airing cell
 -(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout EndTimeForItemAtIndexPath:(NSIndexPath *)indexPath;
--(NSInteger *)epgTimeArrayCountForLayout:(EPGCollectionViewLayout *)epgLayout;
--(NSInteger) epgStationCountForLayout: (EPGCollectionViewLayout *) epgLayout;
+// Return start time for the entire epg (the first start time)
+-(NSDate *)layoutStartTimeForEPG:(EPGCollectionViewLayout *)epgLayout;
+// Binary search for time
+-(NSInteger)layoutBinarySearchForTime:(EPGCollectionViewLayout *)epgLayout forItemAtIndexPath:(NSIndexPath *)indexPath;
+// Return how many cells for hour header view
+-(NSUInteger)epgTimeArrayCountForLayout:(EPGCollectionViewLayout *)epgLayout;
+// Return how many cells for station cell count
+-(NSInteger)epgStationCountForLayout: (EPGCollectionViewLayout *) epgLayout;
+// Closest time interval before airing
 -(NSTimeInterval)layoutTimeIntervalBeforeAiring:(EPGCollectionViewLayout *)epgLayout withClosestTimeIndex:(NSInteger)closestTimeIndex withAiringStartTime:(NSDate *)startTime;
 @end

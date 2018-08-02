@@ -7,7 +7,7 @@
 #import "DataModel.h"
 
 // Interface of the View Controller
-@interface ViewController () <UICollectionViewDelegateFlowLayout>{
+@interface ViewController (){
   UICollectionView *collectionView;
   UICollectionViewFlowLayout *flowLayout;
   NSMutableArray *_timeArray;
@@ -20,7 +20,6 @@
   NSString *timeIndicatorKind;
   NSString *timeCellKind;
   NSString *stationCellKind;
-  
 }
 @end
 
@@ -113,7 +112,7 @@
   //item-1 to account for the first video cell
   return epg.stations[indexPath.section].airings[indexPath.item-1].airingEndTime;
 }
--(NSInteger *)epgTimeArrayCountForLayout:(EPGCollectionViewLayout *)epgLayout{
+-(NSUInteger)epgTimeArrayCountForLayout:(EPGCollectionViewLayout *)epgLayout{
   return _timeArray.count;
 }
 
@@ -121,7 +120,7 @@
   return epg.stations.count;
 }
 
--(NSInteger *)layoutBinarySearchForTime:(EPGCollectionViewLayout *)epgLayout forItemAtIndexPath:(NSIndexPath *)indexPath{
+-(NSInteger)layoutBinarySearchForTime:(EPGCollectionViewLayout *)epgLayout forItemAtIndexPath:(NSIndexPath *)indexPath{
   
   // Subtract 1 to account for the thumbnail cell at item index 0.
   NSDate *currentAiringStartTime = epg.stations[indexPath.section].airings[indexPath.item-1].airingStartTime;
@@ -131,7 +130,6 @@
   if ([closerStartTime earlierDate:currentAiringStartTime]) {
     closerStartTime = currentAiringStartTime;
   }
-  
   NSInteger closestTimeIndex =
   [_timeArray indexOfObject:closerStartTime
               inSortedRange:NSMakeRange(0, _timeArray.count)

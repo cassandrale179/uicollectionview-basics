@@ -7,7 +7,6 @@
   NSMutableDictionary *_itemAttributes;
   NSMutableDictionary *_channelAttributes;
   NSMutableDictionary *_hourAttributes;
- // NSMutableArray *_timeArray;
   CGSize _contentSize;
 }
 

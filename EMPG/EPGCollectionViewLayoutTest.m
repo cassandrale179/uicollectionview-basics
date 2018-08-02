@@ -1,6 +1,7 @@
 #import <XCTest/XCTest.h>
 #import "ViewController.h"
 #import "EPGCollectionViewLayout.h"
+#import "DataModel.h"
 
 @interface EPGCollectionViewLayoutTest : XCTestCase
 
@@ -21,11 +22,14 @@
   //if the cell duration is greater than 30 min but the first Time is after the startTime
 }
 -(void)testSupplementaryView{
-  //
   ViewController *viewController = [[ViewController alloc] init];
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   [viewLayout initWithDelegate:viewController];
-  NSLog(@"Datasource %@", viewLayout.dataSource); 
+  [viewController viewDidLoad];
+  NSInteger timeCellCount = [viewLayout.dataSource epgTimeArrayCountForLayout:viewLayout];
+//  NSLog(@"timecellcountnhghjg %ld" , timeCellCount);
+//  NSLog(@"viewcontroller %@", viewController.timeArra);
+
   
   
 }
