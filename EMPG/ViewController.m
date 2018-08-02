@@ -11,7 +11,7 @@
 @interface ViewController () <UICollectionViewDelegateFlowLayout>{
   UICollectionView *collectionView;
   UICollectionViewFlowLayout *flowLayout;
-  NSMutableArray *timeArray;
+  NSMutableArray *_timeArray;
   EPGRenderer *epg;
   
   // Identifier and view kind constants
@@ -45,7 +45,7 @@
   [viewLayout initWithDelegate:self];
   // Create an epg object
   epg = [DataModel createEPG];
-  timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
+  _timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
   
   // Set Data Source and Delegate and Cell ID
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
@@ -102,22 +102,51 @@
 #pragma mark EPGDataSourceDelegate
 
 -(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout startTimeForItemAtIndexPath:(NSIndexPath *)indexPath{
-
   //item-1 to account for the first video cell
   return epg.stations[indexPath.section].airings[indexPath.item-1].airingStartTime;
+}
+-(NSDate *)layoutStartTimeForEPG:(EPGCollectionViewLayout *)epgLayout{
+  return _timeArray[0];
 }
 -(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout EndTimeForItemAtIndexPath:(NSIndexPath *)indexPath{
 
   //item-1 to account for the first video cell
   return epg.stations[indexPath.section].airings[indexPath.item-1].airingEndTime;
 }
--(NSArray *)epgTimeArrayForLayout:(EPGCollectionViewLayout *)epgLayout{
-  return timeArray;
+-(NSInteger *)epgTimeArrayCountForLayout:(EPGCollectionViewLayout *)epgLayout{
+  return _timeArray.count;
 }
 
 - (NSInteger)epgStationCountForLayout:(EPGCollectionViewLayout *)epgLayout{
   return epg.stations.count;
 }
+
+-(NSInteger *)layoutBinarySearchForTime:(EPGCollectionViewLayout *)epgLayout forItemAtIndexPath:(NSIndexPath *)indexPath{
+  
+  // Subtract 1 to account for the thumbnail cell at item index 0.
+  NSDate *currentAiringStartTime = epg.stations[indexPath.section].airings[indexPath.item-1].airingStartTime;
+  
+  // For first airing cell in case the show started before the first time in the time header cells.
+  NSDate *closerStartTime = _timeArray[0];
+  if ([closerStartTime earlierDate:currentAiringStartTime]) {
+    closerStartTime = currentAiringStartTime;
+  }
+  
+  NSInteger closestTimeIndex =
+  [_timeArray indexOfObject:closerStartTime
+              inSortedRange:NSMakeRange(0, _timeArray.count)
+                    options:NSBinarySearchingInsertionIndex
+            usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2) {
+              return [time1 compare:time2];
+            }];
+  closestTimeIndex -= 1;
+  return closestTimeIndex;
+}
+
+-(NSTimeInterval)layoutTimeIntervalBeforeAiring:(EPGCollectionViewLayout *)epgLayout withClosestTimeIndex:(NSInteger)closestTimeIndex withAiringStartTime:(NSDate *)startTime{
+  return [startTime timeIntervalSinceDate:_timeArray[closestTimeIndex]];
+}
+
 
 #pragma mark METHODS FOR SUPPLEMENTARY VIEW
 // Dequeue method for time cell, time line cell, and station cell
@@ -126,7 +155,7 @@
                                  atIndexPath:(NSIndexPath *)indexPath{
   if ([kind isEqualToString:timeCellKind]){
     TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind: timeCellKind withReuseIdentifier:timeCellIdentifier forIndexPath:indexPath];
-    [timeCell setup: [timeArray objectAtIndex: indexPath.item]];
+    [timeCell setup: [_timeArray objectAtIndex: indexPath.item]];
     return timeCell;
   }
   else if ([kind isEqualToString:@"ChannelHeaderView"]){
