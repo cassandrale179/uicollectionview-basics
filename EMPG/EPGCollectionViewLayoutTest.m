@@ -22,23 +22,23 @@
   //if the cell duration is greater than 30 min but the first Time is after the startTime
 }
 -(void)testSupplementaryView{
+  
+  // Set up methods to get a fake time array for testing purpose.
   FakeViewController *fakeViewController = [[FakeViewController alloc] init];
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   [viewLayout initWithDelegate:fakeViewController];
   [fakeViewController viewDidLoad];
-  NSLog(@"fakearray %@", [fakeViewController valueForKey:@"_timeArray"]);
+  NSMutableArray *fakeTimeArray = [fakeViewController valueForKey:@"_timeArray"];
   
   
-  
-//  ViewController *viewController = [[ViewController alloc] init];
-//  EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
-//  [viewLayout initWithDelegate:viewController];
-//  [viewController viewDidLoad];
-//  NSInteger timeCellCount = [viewLayout.dataSource epgTimeArrayCountForLayout:viewLayout];
-//  NSLog(@"timecellcountnhghjg %ld" , timeCellCount);
-//  NSLog(@"viewcontroller %@", viewController.timeArra);
-
-  
+  // Test if the time interval between the time array is 30 minutes.
+  for (int i = 0; i < fakeTimeArray.count-1; i++){
+    NSDate *firstTime = fakeTimeArray[i];
+    NSDate *secondTime = fakeTimeArray[i+1];
+    NSTimeInterval secondsBetween = [secondTime timeIntervalSinceDate:firstTime];
+    int minutes = secondsBetween / 60;
+    XCTAssertEqual(minutes, 30);
+  }
   
 }
 
