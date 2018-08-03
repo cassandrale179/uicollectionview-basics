@@ -10,6 +10,8 @@ extern CGFloat const kVerticalPadding = 50;
 extern CGFloat const kBorderPadding = 30;
 extern CGFloat const kAiringIntervalMinutes = 30;
 -(void)initWithDelegate:(id<EPGDataSourceDelegate>)dataSourceDelegate;
+-(CGFloat)numOfHalfHourIntervals:(NSDate *)airingStartTime withEndTime:(NSDate *)airingEndTime;
+-(CGFloat) startingXPositionForAiring:(NSDate *)airingStartTime withIndexPath:(NSIndexPath *)indexPath;
 @end
 @protocol EPGDataSourceDelegate <NSObject>
 // Return start time for airing cell
