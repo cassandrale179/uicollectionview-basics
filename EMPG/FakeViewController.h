@@ -7,4 +7,5 @@
 @interface FakeViewController : UIViewController <EPGDataSourceDelegate, UICollectionViewDelegate,
 UICollectionViewDataSource,
 UICollectionViewDelegateFlowLayout>
+- (void) setUpFake; 
 @end

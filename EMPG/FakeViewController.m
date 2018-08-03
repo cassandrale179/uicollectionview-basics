@@ -40,13 +40,9 @@
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   [viewLayout initWithDelegate:self];
-  //TODO: Create a NEW epg object, but the time array needs to start 30 min after the first airing start time
-  // Create an epg object
- // epg = [DataModel createEPG];
-  //_timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
-
   epg = [self createEPG];
   _timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
+  NSLog(@"time array %@", _timeArray);
   NSDateFormatter *df = [[NSDateFormatter alloc] init];
   [df setDateFormat:@"HH:mm:ss"];
   NSLog(@"The startTime: %@", [df stringFromDate:epg2.stations[0].airings[0].airingStartTime]);

@@ -59,13 +59,13 @@
 // create the sample data to be used in deciding the size for the layout methods
 + (EPGRenderer *)createEPG {
   EPGRenderer *epg = [[EPGRenderer alloc] init];
-  
+
   // Create a list of stations
   NSMutableArray *epgStations = [[NSMutableArray alloc] init];
   NSArray *stationTitle =
   [NSArray arrayWithObjects:@"fox", @"kpix5", @"abc7", @"nbc11", @"thecw", @"food", @"hgtv",
    @"showtime", @"premiere", @"disney", nil];
-  
+
   // Create arrays to fill out information
   NSArray *d1 = [NSArray arrayWithObjects:@"New Girl", @"The Mick", @"Big Bang Theory", nil];
   NSArray *times1 = [NSArray arrayWithObjects:@"8:00-9:30", @"9:30-10:00", @"10:00-12:00", nil];
@@ -95,17 +95,17 @@
   NSArray *d10 = [NSArray arrayWithObjects:@"The Kind Of Queens", @"Two And A Half Man",
                   @"Howdie Mandel All-Star Comedy Gala", nil];
   NSArray *times10 = [NSArray arrayWithObjects:@"9:00-9:30", @"9:30-10:00", @"10:00-12:00", nil];
-  
+
   // Create a nested array to hold all information
   NSArray *allTitles = [NSArray arrayWithObjects:d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, nil];
   NSArray *allTimes = [NSArray arrayWithObjects:times1, times2, times3, times4, times5, times6,
                        times7, times8, times9, times10, nil];
-  
+
   // Create an array of stations for one epg s
   for (int i = 0; i < [stationTitle count]; i++) {
     StationRenderer *station = [[StationRenderer alloc] init];
     NSMutableArray *stationAirings = [[NSMutableArray alloc] init];
-    
+
     // Create dummy variables for now
     NSArray *currentTitle = allTitles[i];
     NSArray *currentTime = allTimes[i];
@@ -127,7 +127,7 @@
 // Dynamic calculate start and end time of the UICollectionView
 + (NSMutableArray *)calculateEPGTime:(EPGRenderer *)epgObject timeInterval:(NSInteger)time{
   NSMutableArray *timeArray = [[NSMutableArray alloc] init];
-  
+
   // Create an array of all airings
   NSMutableArray *allAirings = [[NSMutableArray alloc] init];
   for (StationRenderer* station in epgObject.stations){
@@ -135,7 +135,7 @@
       [allAirings addObject:airing];
     }
   }
-  
+
   // Sort all airing array to find start time and end time
   NSSortDescriptor *startTimeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"airingStartTime" ascending:YES];
   NSSortDescriptor *endTimeDescriptor = [[NSSortDescriptor alloc] initWithKey:@"airingEndTime" ascending:NO];
@@ -145,7 +145,7 @@
   NSDate *epgEndTime = ((AiringRenderer *)[sortedEndTimeArray objectAtIndex:0]).airingEndTime;
   NSDate *formatStartTime = [self formatTime: epgStartTime];
   NSDate *formatEndTime = [self formatTime:epgEndTime];
-  
+
   // Build an array of time intervals
   NSDate *interval = formatStartTime;
   while (interval < formatEndTime){
@@ -167,7 +167,7 @@
   else{
     minutes = 30;
   }
-  
+
   // Modify the NSDate component
   NSCalendar *calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
   NSDateComponents *comps = [calendar components:(
