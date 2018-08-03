@@ -42,15 +42,12 @@
   [viewLayout initWithDelegate:self];
   epg = [self createEPG];
   _timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
-  NSLog(@"time array %@", _timeArray);
   NSDateFormatter *df = [[NSDateFormatter alloc] init];
   [df setDateFormat:@"HH:mm:ss"];
-  NSLog(@"The startTime: %@", [df stringFromDate:epg2.stations[0].airings[0].airingStartTime]);
   NSDate *startTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]];
-  NSLog(@"The time from the datasource: %@", [df stringFromDate:startTime]);
   //connect the collectionView with the layout
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
-
+  [viewLayout prepareLayout];
 }
 
 #pragma mark EPGDataSourceDelegate

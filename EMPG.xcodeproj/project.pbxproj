@@ -21,7 +21,6 @@
 		606F00E420FEAF9F00DCD67E /* DataModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 606F00E120FEAF9F00DCD67E /* DataModel.m */; };
 		60F0990E211379D300E33A94 /* EPGCollectionViewLayoutTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F0990D211379D300E33A94 /* EPGCollectionViewLayoutTest.m */; };
 		60F099112113B68000E33A94 /* FakeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F099102113B68000E33A94 /* FakeViewController.m */; };
-		60F099142115034700E33A94 /* FakeCollectionViewLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F099132115034700E33A94 /* FakeCollectionViewLayout.m */; };
 		982C7123210264950065DE8A /* TimeCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 982C7121210264940065DE8A /* TimeCell.m */; };
 		982C712621029AF90065DE8A /* TimeIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 982C712521029AF90065DE8A /* TimeIndicatorCell.m */; };
 		982C712C210653280065DE8A /* StationCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 982C712B210653280065DE8A /* StationCell.m */; };
@@ -70,8 +69,6 @@
 		60F0990D211379D300E33A94 /* EPGCollectionViewLayoutTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EPGCollectionViewLayoutTest.m; sourceTree = "<group>"; };
 		60F0990F2113B68000E33A94 /* FakeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeViewController.h; sourceTree = "<group>"; };
 		60F099102113B68000E33A94 /* FakeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeViewController.m; sourceTree = "<group>"; };
-		60F099122115034700E33A94 /* FakeCollectionViewLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeCollectionViewLayout.h; sourceTree = "<group>"; };
-		60F099132115034700E33A94 /* FakeCollectionViewLayout.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FakeCollectionViewLayout.m; sourceTree = "<group>"; };
 		982C7121210264940065DE8A /* TimeCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeCell.m; sourceTree = "<group>"; };
 		982C7122210264950065DE8A /* TimeCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeCell.h; sourceTree = "<group>"; };
 		982C712421029AF90065DE8A /* TimeIndicatorCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TimeIndicatorCell.h; sourceTree = "<group>"; };
@@ -137,8 +134,6 @@
 				606F00E020FEAF9F00DCD67E /* EPGCollectionViewLayout.h */,
 				606F00DF20FEAF9F00DCD67E /* EPGCollectionViewLayout.m */,
 				60F0990D211379D300E33A94 /* EPGCollectionViewLayoutTest.m */,
-				60F099122115034700E33A94 /* FakeCollectionViewLayout.h */,
-				60F099132115034700E33A94 /* FakeCollectionViewLayout.m */,
 				60F0990F2113B68000E33A94 /* FakeViewController.h */,
 				60F099102113B68000E33A94 /* FakeViewController.m */,
 				982C712A210653280065DE8A /* StationCell.h */,
@@ -307,7 +302,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				60F099112113B68000E33A94 /* FakeViewController.m in Sources */,
-				60F099142115034700E33A94 /* FakeCollectionViewLayout.m in Sources */,
 				601833D320FD717900F94150 /* ViewController.m in Sources */,
 				606F00E320FEAF9F00DCD67E /* EPGCollectionViewLayout.m in Sources */,
 				601833DE20FD717A00F94150 /* main.m in Sources */,
