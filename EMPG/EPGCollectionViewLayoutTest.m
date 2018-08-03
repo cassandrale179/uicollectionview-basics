@@ -15,7 +15,23 @@ static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
 static const CGFloat xPadding = kThumbnailSize*kHalfHourWidth;
 
 
-
+- (void)testStartingPositionOfAiringCells{
+  //Set up the data model
+  FakeViewController *viewController = [[FakeViewController alloc] init];
+  EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
+  [viewLayout initWithDelegate:viewController];
+  [viewController setUpFake];
+  
+  //TODO: if the firstTime is before (more than 30 min) the airing cell
+  
+  //if the firstTime is more recent than the first airing cell startTime(ex. @"9:30-10:00", firstTime: "7:30")
+  NSIndexPath *currentCellIndex = [NSIndexPath indexPathForItem:1 inSection:0];
+   AiringRenderer *currentAiringStartTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:currentCellIndex];
+  CGFloat startXPosition = [viewLayout startingXPositionForAiring:currentAiringStartTime withIndexPath:currentCellIndex];
+  XCTAssertEqualWithAccuracy(startXPosition, kChannelHeaderWidth+kThumbnailSize*kHalfHourWidth, .1);
+  //if the start position is within 30 of the firstTime
+  //if the startTime is the firstTime
+}
 -(void)testSupplementaryView{
 
   // Set up methods to get a fake time array for testing purpose.
