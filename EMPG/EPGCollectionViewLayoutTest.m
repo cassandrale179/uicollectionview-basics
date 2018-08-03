@@ -40,6 +40,13 @@
     XCTAssertEqual(minutes, 30);
   }
   
+  // Test if there are correct number of header time cells
+  NSDate *firstTime = fakeTimeArray[0];
+  NSDate *lastTime = [fakeTimeArray lastObject];
+  NSTimeInterval secondsBetween = [lastTime timeIntervalSinceDate:firstTime];
+  int totalTimeIntervals = (secondsBetween / 60) / 30 + 1;
+  XCTAssertEqual([fakeTimeArray count], totalTimeIntervals);
+
 }
 
 - (void)setUp {
