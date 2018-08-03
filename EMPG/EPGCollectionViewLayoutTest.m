@@ -15,25 +15,53 @@ static const CGFloat kThumbnailSize = 0.5;        // size of the video thumbnail
 static const CGFloat xPadding = kThumbnailSize*kHalfHourWidth;
 
 
-//- (void)testStartingPositionOfAiringCells{
-//  //Set up the data model
-//  FakeViewController *viewController = [[FakeViewController alloc] init];
-//  EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
-//  [viewLayout initWithDelegate:viewController];
-//  [viewController setUpFake];
-//  [viewLayout prepareLayout];
-//
-//  //TODO: if the firstTime is before (more than 30 min) the airing cell
-//
-//  //if the firstTime is more recent than the first airing cell startTime(ex. @"9:30-10:00", firstTime: "7:30")w
-//
-//  NSIndexPath *currentCellIndex = [NSIndexPath indexPathForItem:1 inSection:0];
-//  AiringRenderer *currentAiringStartTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:currentCellIndex];
-//  CGFloat startXPosition = [viewLayout startingXPositionForAiring:currentAiringStartTime withIndexPath:currentCellIndex];
-//  XCTAssertEqualWithAccuracy(startXPosition, kChannelHeaderWidth+kThumbnailSize*kHalfHourWidth, .1);
-//  //if the start position is within 30 of the firstTime
-//  //if the startTime is the firstTime
-//}
+- (void)testStartingPositionOfAiringCells{
+  //Set up the data model
+  FakeViewController *viewController = [[FakeViewController alloc] init];
+  EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
+  [viewLayout initWithDelegate:viewController];
+  [viewController setUpFake];
+  [viewLayout prepareLayout];
+  
+  //TODO: if the firstTime is before (more than 30 min) the airing cell
+  
+  //if the start position is within 30 of the firstTime (ex. @"7:40-9:45", firstTime: "7:30")
+  NSIndexPath *currentCellIndex = [NSIndexPath indexPathForItem:1 inSection:1];
+  AiringRenderer *currentAiringStartTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:currentCellIndex];
+  CGFloat startXPosition = [viewLayout startingXPositionForAiring:currentAiringStartTime withIndexPath:currentCellIndex];
+  XCTAssertEqualWithAccuracy(startXPosition, kChannelHeaderWidth+kThumbnailSize*kHalfHourWidth+(kHalfHourWidth/3), 1);
+  
+  //if the startTime is the firstTime (ex. @"7:30-9:30", firstTime: "7:30")
+  currentCellIndex = [NSIndexPath indexPathForItem:1 inSection:0];
+  currentAiringStartTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:currentCellIndex];
+  startXPosition = [viewLayout startingXPositionForAiring:currentAiringStartTime withIndexPath:currentCellIndex];
+  XCTAssertEqualWithAccuracy(startXPosition, kChannelHeaderWidth+kThumbnailSize*kHalfHourWidth, 1);
+}
+-(void)testAiringCellWidthByDuration{
+  //Set up the data model
+  FakeViewController *viewController = [[FakeViewController alloc] init];
+  EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
+  [viewLayout initWithDelegate:viewController];
+  [viewController setUpFake];
+  
+  //if the cell duration is equal to 30 min (ex. @"9:30-10:00")
+  AiringRenderer *currentAiringStartTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:[NSIndexPath indexPathForItem:2 inSection:0]];
+  AiringRenderer *currentAiringEndTime = [viewLayout.dataSource layout:viewLayout EndTimeForItemAtIndexPath:[NSIndexPath indexPathForItem:2 inSection:0]];
+  XCTAssertEqual([viewLayout numOfHalfHourIntervals:currentAiringStartTime withEndTime:currentAiringEndTime], 1);
+  
+  //if the cell duration is less than 30 min (ex. @"10:15-10:30")
+  currentAiringStartTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:[NSIndexPath indexPathForItem:3 inSection:0]];
+  currentAiringEndTime = [viewLayout.dataSource layout:viewLayout EndTimeForItemAtIndexPath:[NSIndexPath indexPathForItem:3 inSection:0]];
+  XCTAssertEqual([viewLayout numOfHalfHourIntervals:currentAiringStartTime withEndTime:currentAiringEndTime], 0.5);
+  
+  //if the cell duration is greater than 30 min (ex. @"7:30-9:30")
+  currentAiringStartTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]];
+  currentAiringEndTime = [viewLayout.dataSource layout:viewLayout EndTimeForItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]];
+  XCTAssertEqual([viewLayout numOfHalfHourIntervals:currentAiringStartTime withEndTime:currentAiringEndTime], 4);
+  
+  //if the cell duration is greater than 30 min but the Airing start time is before the first Time
+ // XCTAssertEqual([viewLayout numOfHalfHourIntervals:currentAiringStartTime withEndTime:currentAiringEndTime], );
+}
 -(void)testSupplementaryView{
 
   // Set up methods to get a fake time array for testing purpose.
