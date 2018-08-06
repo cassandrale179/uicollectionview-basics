@@ -97,7 +97,7 @@
   return cell;
 }
 
-#pragma mark EPGDataSourceDelegate
+#pragma mark EPGDataSource
 
 -(NSDate *)layout:(EPGCollectionViewLayout *)epgLayout startTimeForItemAtIndexPath:(NSIndexPath *)indexPath{
   //item-1 to account for the first video cell

@@ -3,8 +3,8 @@
 /**
  * View controller class update the contents of the views in response changes in data
  */
-@protocol EPGDataSourceDelegate;
-@interface ViewController : UIViewController <EPGDataSourceDelegate, UICollectionViewDelegate,
+@protocol EPGDataSource;
+@interface ViewController : UIViewController <EPGDataSource, UICollectionViewDelegate,
                                               UICollectionViewDataSource,
                                               UICollectionViewDelegateFlowLayout>
 @end
