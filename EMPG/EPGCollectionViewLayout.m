@@ -7,12 +7,14 @@
   NSMutableDictionary *_itemAttributes;
   NSMutableDictionary *_channelAttributes;
   NSMutableDictionary *_hourAttributes;
+  // NSMutableArray *_timeArray;
   CGSize _contentSize;
 }
 
 // Measurement constants
 static const CGFloat kCellHeight = 100;
 static const CGFloat kHalfHourWidth = 400;
+static const CGFloat kVerticalPadding = 50;
 
 // Constants for views
 static const NSString *kTimeIndicatorKind = @"TimeIndicatorView";
@@ -29,7 +31,7 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 // Other attributes
 
 // BOOL needSetup = YES;
-- (void)initWithDelegate:(id<EPGDataSourceDelegate>)dataSourceDelegate {
+- (void)initWithDelegate:(id<EPGDataSource>)dataSourceDelegate {
   _dataSource = dataSourceDelegate;
 }
 
@@ -86,11 +88,13 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 
           // If the cell is not a thumbnail
           if (item != 0) {
-            NSDate *currentAiringStartTime = [_dataSource layout:self startTimeForItemAtIndexPath:cellIndex];
+            NSDate *currentAiringStartTime = [_dataSource layout:self
+                                     startTimeForItemAtIndexPath:cellIndex];
             xPos = [self startingXPositionForAiring:currentAiringStartTime withIndexPath:cellIndex];
             NSDate *currentAiringEndTime = [_dataSource layout:self
                                      EndTimeForItemAtIndexPath:cellIndex];
-            numHalfHourIntervals = [self numOfHalfHourIntervals:currentAiringStartTime withEndTime:currentAiringEndTime];
+            numHalfHourIntervals = [self numOfHalfHourIntervals:currentAiringStartTime
+                                                    withEndTime:currentAiringEndTime];
             attr =
                 [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:cellIndex];
           } else {
@@ -139,17 +143,22 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 
 #pragma mark Airing Cell Calculations
 // Return the factor by which the standard cell width should be multipled, given a certain duration
--(CGFloat)numOfHalfHourIntervals:(NSDate *)airingStartTime withEndTime:(NSDate *)airingEndTime{
-  return [airingEndTime timeIntervalSinceDate:airingStartTime] / (kAiringIntervalMinutes * 60.) ;
+- (CGFloat)numOfHalfHourIntervals:(NSDate *)airingStartTime withEndTime:(NSDate *)airingEndTime {
+  return [airingEndTime timeIntervalSinceDate:airingStartTime] / (kAiringIntervalMinutes * 60.);
 }
 
-//Return the x position that the airing cell should start at in relation to the header time cells
--(CGFloat) startingXPositionForAiring:(NSDate *)airingStartTime withIndexPath:(NSIndexPath *)indexPath{
-  NSInteger closestTimeIndex = [_dataSource layoutBinarySearchForTime:self forItemAtIndexPath:indexPath];
-  UICollectionViewLayoutAttributes *hourAttributes = _hourAttributes[[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
-  return [_dataSource layoutTimeIntervalBeforeAiring:self withClosestTimeIndex:closestTimeIndex withAiringStartTime:airingStartTime]/
-  (kAiringIntervalMinutes * 60.) * kHalfHourWidth +
-  hourAttributes.frame.origin.x;
+// Return the x position that the airing cell should start at in relation to the header time cells
+- (CGFloat)startingXPositionForAiring:(NSDate *)airingStartTime
+                        withIndexPath:(NSIndexPath *)indexPath {
+  NSInteger closestTimeIndex = [_dataSource layoutBinarySearchForTime:self
+                                                   forItemAtIndexPath:indexPath];
+  UICollectionViewLayoutAttributes *hourAttributes =
+      _hourAttributes[[NSIndexPath indexPathForItem:closestTimeIndex inSection:0]];
+  return [_dataSource layoutTimeIntervalBeforeAiring:self
+                                withClosestTimeIndex:closestTimeIndex
+                                 withAiringStartTime:airingStartTime] /
+             (kAiringIntervalMinutes * 60.) * kHalfHourWidth +
+         hourAttributes.frame.origin.x;
 }
 
 #pragma mark Layout Attribute for Element in Rect and Supplementary View
@@ -210,7 +219,8 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
     CGFloat currentTimeMarker =
         [[timeAtFront dateByAddingTimeInterval:1080] timeIntervalSinceDate:timeAtFront] /
         (60 * 30.) * kHalfHourWidth;
-    attributes.frame = CGRectMake(currentTimeMarker, topOfIndicator, 2, _contentSize.height);
+    CGFloat timeMarkerWidth = 2.0;
+    attributes.frame = CGRectMake(currentTimeMarker, topOfIndicator, timeMarkerWidth, _contentSize.height);
     attributes.zIndex = [self zIndexForElementKind:kTimeIndicatorKind];
   }
   return attributes;
@@ -229,6 +239,7 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 }
 
 #pragma mark Method for Hour Header View
+
 // Return an array of all the index paths for the hour.
 - (NSArray *)indexPathsOfHourHeaderViews {
   NSMutableArray *indexPaths = [NSMutableArray array];
@@ -255,6 +266,7 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 }
 
 #pragma mark Helper methods
+
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
   return _itemAttributes[indexPath];
 }
