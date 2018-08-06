@@ -15,6 +15,8 @@
 static const CGFloat kCellHeight = 100;
 static const CGFloat kHalfHourWidth = 400;
 static const CGFloat kVerticalPadding = 50;
+static const CGFloat kChannelCellWidth = 100;
+static const CGFloat kChannelCellHeight = 100;
 
 // Constants for views
 static const NSString *kTimeIndicatorKind = @"TimeIndicatorView";
@@ -136,12 +138,14 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
     // Get attributes of the airing cells to vertically align the channel and airing cells.
     UICollectionViewLayoutAttributes *cellattr =
         _itemAttributes[[NSIndexPath indexPathForItem:0 inSection:indexPath.section]];
-    attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, 100, 100);
+    
+    attributes.frame = CGRectMake(xOffset, cellattr.frame.origin.y, kChannelCellWidth, kChannelCellHeight);
     _channelAttributes[indexPath] = attributes;
   }
 }
 
 #pragma mark Airing Cell Calculations
+
 // Return the factor by which the standard cell width should be multipled, given a certain duration
 - (CGFloat)numOfHalfHourIntervals:(NSDate *)airingStartTime withEndTime:(NSDate *)airingEndTime {
   return [airingEndTime timeIntervalSinceDate:airingStartTime] / (kAiringIntervalMinutes * 60.);
@@ -162,7 +166,8 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 }
 
 #pragma mark Layout Attribute for Element in Rect and Supplementary View
-// Return the frame for each cell (333.333 0; 200 100).
+
+// Return the frame for each cell
 - (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect {
   NSMutableArray *attributesInRect = [[NSMutableArray alloc] init];
 
