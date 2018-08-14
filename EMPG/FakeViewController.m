@@ -39,7 +39,7 @@
 
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
-  [viewLayout initWithDelegate:self];
+  [viewLayout initWithDataSource:self];
   //TODO: Create a NEW epg object, but the time array needs to start 30 min after the first airing start time
   // Create an epg object
  // epg = [DataModel createEPG];

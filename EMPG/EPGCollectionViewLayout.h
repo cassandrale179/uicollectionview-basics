@@ -8,7 +8,7 @@
 @property(nonatomic, weak) id<EPGDataSource> dataSource;
 extern CGFloat const kBorderPadding = 30;
 extern CGFloat const kAiringIntervalMinutes = 30;
-- (void)initWithDelegate:(id<EPGDataSource>)dataSourceDelegate;
+- (void)initWithDataSource:(id<EPGDataSource>)dataSourceDelegate;
 -(CGFloat)numOfHalfHourIntervals:(NSDate *)airingStartTime withEndTime:(NSDate *)airingEndTime;
 -(CGFloat) startingXPositionForAiring:(NSDate *)airingStartTime withIndexPath:(NSIndexPath *)indexPath;
 @end

@@ -32,12 +32,12 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 
 // Other attributes
 
-// BOOL needSetup = YES;
-- (void)initWithDelegate:(id<EPGDataSource>)dataSourceDelegate {
+- (void)initWithDataSource:(id<EPGDataSource>)dataSourceDelegate {
   _dataSource = dataSourceDelegate;
 }
 
 #pragma mark Prepare Layout
+
 // Return content size.
 - (CGSize)collectionViewContentSize {
   return _contentSize;
@@ -45,7 +45,6 @@ static const CGFloat topOfIndicator = 20;         // space between screen and ti
 
 // Calculating the bounds (origin x and y) of the cells.
 - (void)prepareLayout {
-  //_timeArray = [_dataSource epgTimeArrayForLayout:self];
 
   // setting the frame for the various cells
   [self setAttributesForTimeHeaders];
