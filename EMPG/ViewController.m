@@ -11,58 +11,58 @@
   UICollectionView *collectionView;
   // UICollectionViewFlowLayout *flowLayout;
   NSMutableArray *_timeArray;
-  EPGRenderer *epg;
-
+  EPGRenderer *_epg;
+  
   // Identifier and view kind constants
-  NSString *timeCellIdentifier;
-  NSString *timeIndicatorIdentifier;
-  NSString *stationCellIdentifier;
-  NSString *timeIndicatorKind;
-  NSString *timeCellKind;
-  NSString *stationCellKind;
+  NSString *_timeCellIdentifier;
+  NSString *_timeIndicatorIdentifier;
+  NSString *_stationCellIdentifier;
+  NSString *_timeIndicatorKind;
+  NSString *_timeCellKind;
+  NSString *_stationCellKind;
 }
 @end
 // Implementation of the View Controller
 @implementation ViewController
 - (void)viewDidLoad {
   [super viewDidLoad];
-
+  
   // Intialize view kind here
-  timeIndicatorKind = @"TimeIndicatorView";
-  timeCellKind = @"HourHeaderView";
-  stationCellKind = @"ChannelHeaderView";
-
+  _timeIndicatorKind = @"TimeIndicatorView";
+  _timeCellKind = @"HourHeaderView";
+  _stationCellKind = @"ChannelHeaderView";
+  
   // Initialize class identifier
-  timeIndicatorIdentifier = NSStringFromClass([timeIndicatorKind class]);
-  timeCellIdentifier = NSStringFromClass([TimeCell class]);
-  stationCellIdentifier = NSStringFromClass([StationCell class]);
-
+  _timeIndicatorIdentifier = NSStringFromClass([_timeIndicatorKind class]);
+  _timeCellIdentifier = NSStringFromClass([TimeCell class]);
+  _stationCellIdentifier = NSStringFromClass([StationCell class]);
+  
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   [viewLayout initWithDataSource:self];
   // Create an epg object
-  epg = [DataModel createEPG];
-  _timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
-
+  _epg = [DataModel createEPG];
+  _timeArray = [DataModel calculateEPGTime:_epg timeInterval:kAiringIntervalMinutes];
+  
   // Set Data Source and Delegate and Cell ID
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame
                                       collectionViewLayout:viewLayout];
   [collectionView setDataSource:self];
   [collectionView setDelegate:self];
-
+  
   // Register Class Method goes here
   [collectionView registerClass:[EPGCollectionViewCell class]
-      forCellWithReuseIdentifier:@"epgCell"];
+     forCellWithReuseIdentifier:@"epgCell"];
   [collectionView registerClass:[TimeCell class]
-      forSupplementaryViewOfKind:timeCellKind
-             withReuseIdentifier:timeCellIdentifier];
+     forSupplementaryViewOfKind:_timeCellKind
+            withReuseIdentifier:_timeCellIdentifier];
   [collectionView registerClass:[StationCell class]
-      forSupplementaryViewOfKind:stationCellKind
-             withReuseIdentifier:stationCellIdentifier];
+     forSupplementaryViewOfKind:_stationCellKind
+            withReuseIdentifier:_stationCellIdentifier];
   [collectionView registerClass:[TimeIndicatorCell class]
-      forSupplementaryViewOfKind:timeIndicatorKind
-             withReuseIdentifier:timeIndicatorIdentifier];
-
+     forSupplementaryViewOfKind:_timeIndicatorKind
+            withReuseIdentifier:_timeIndicatorIdentifier];
+  
   // Set background color and disable scrolling diagonally
   self.view = collectionView;
   [collectionView setBackgroundColor:[UIColor whiteColor]];
@@ -73,14 +73,14 @@
 
 // Return how many rows within UI Collection View
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
-  NSInteger row = [epg.stations count];
+  NSInteger row = [_epg.stations count];
   return row;
 }
 
 // Return how many columns within UI Collection View
 - (NSInteger)collectionView:(UICollectionView *)collectionView
      numberOfItemsInSection:(NSInteger)section {
-  NSInteger column = [epg.stations[section].airings count];
+  NSInteger column = [_epg.stations[section].airings count];
   // add one to accomodate the first video thumbnail cell
   return column + 1;
 }
@@ -92,8 +92,8 @@
                                                                           forIndexPath:indexPath];
   // set the content of each cell
   if (indexPath.item != 0) {
-    [cell setup:epg.stations[indexPath.section].airings[indexPath.item - 1].airingTitle
-        withDescription:@"sampledescription"];
+    [cell setup:_epg.stations[indexPath.section].airings[indexPath.item - 1].airingTitle
+withDescription:@"sampledescription"];
   } else {
     [cell setup:@"video" withDescription:@"sampledescription"];
   }
@@ -103,44 +103,44 @@
 #pragma mark EPGDataSource Delegate
 
 - (NSDate *)layout:(EPGCollectionViewLayout *)epgLayout
-    startTimeForItemAtIndexPath:(NSIndexPath *)indexPath {
+startTimeForItemAtIndexPath:(NSIndexPath *)indexPath {
   // item-1 to account for the first video cell
-  return epg.stations[indexPath.section].airings[indexPath.item - 1].airingStartTime;
+  return _epg.stations[indexPath.section].airings[indexPath.item - 1].airingStartTime;
 }
 - (NSDate *)layoutStartTimeForEPG:(EPGCollectionViewLayout *)epgLayout {
   return _timeArray[0];
 }
 - (NSDate *)layout:(EPGCollectionViewLayout *)epgLayout
-    EndTimeForItemAtIndexPath:(NSIndexPath *)indexPath {
+EndTimeForItemAtIndexPath:(NSIndexPath *)indexPath {
   // item-1 to account for the first video cell
-  return epg.stations[indexPath.section].airings[indexPath.item - 1].airingEndTime;
+  return _epg.stations[indexPath.section].airings[indexPath.item - 1].airingEndTime;
 }
 - (NSInteger *)epgTimeArrayCountForLayout:(EPGCollectionViewLayout *)epgLayout {
   return _timeArray.count;
 }
 
 - (NSInteger)epgStationCountForLayout:(EPGCollectionViewLayout *)epgLayout {
-  return epg.stations.count;
+  return _epg.stations.count;
 }
 
 - (NSInteger *)layoutBinarySearchForTime:(EPGCollectionViewLayout *)epgLayout
                       forItemAtIndexPath:(NSIndexPath *)indexPath {
   // Subtract 1 to account for the thumbnail cell at item index 0.
   NSDate *currentAiringStartTime =
-      epg.stations[indexPath.section].airings[indexPath.item - 1].airingStartTime;
-
+  _epg.stations[indexPath.section].airings[indexPath.item - 1].airingStartTime;
+  
   // For first airing cell in case the show started before the first time in the time header cells.
   NSDate *closerStartTime = _timeArray[0];
   if ([closerStartTime earlierDate:currentAiringStartTime]) {
     closerStartTime = currentAiringStartTime;
   }
   NSInteger closestTimeIndex =
-      [_timeArray indexOfObject:closerStartTime
-                  inSortedRange:NSMakeRange(0, _timeArray.count)
-                        options:NSBinarySearchingInsertionIndex
-                usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2) {
-                  return [time1 compare:time2];
-                }];
+  [_timeArray indexOfObject:closerStartTime
+              inSortedRange:NSMakeRange(0, _timeArray.count)
+                    options:NSBinarySearchingInsertionIndex
+            usingComparator:^NSComparisonResult(NSDate *time1, NSDate *time2) {
+              return [time1 compare:time2];
+            }];
   closestTimeIndex -= 1;
   return closestTimeIndex;
 }
@@ -156,24 +156,24 @@
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath {
-  if ([kind isEqualToString:timeCellKind]) {
-    TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind:timeCellKind
-                                                            withReuseIdentifier:timeCellIdentifier
+  if ([kind isEqualToString:_timeCellKind]) {
+    TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind:_timeCellKind
+                                                            withReuseIdentifier:_timeCellIdentifier
                                                                    forIndexPath:indexPath];
     [timeCell setup:[_timeArray objectAtIndex:indexPath.item]];
     return timeCell;
   } else if ([kind isEqualToString:@"ChannelHeaderView"]) {
     StationCell *stationCell =
-        [collectionView dequeueReusableSupplementaryViewOfKind:@"ChannelHeaderView"
-                                           withReuseIdentifier:stationCellIdentifier
-                                                  forIndexPath:indexPath];
-    [stationCell setup:epg.stations[indexPath.section].stationName];
+    [collectionView dequeueReusableSupplementaryViewOfKind:@"ChannelHeaderView"
+                                       withReuseIdentifier:_stationCellIdentifier
+                                              forIndexPath:indexPath];
+    [stationCell setup:_epg.stations[indexPath.section].stationName];
     return stationCell;
-  } else if ([kind isEqualToString:timeIndicatorKind]) {
+  } else if ([kind isEqualToString:_timeIndicatorKind]) {
     TimeIndicatorCell *timeIndicatorCell =
-        [collectionView dequeueReusableSupplementaryViewOfKind:timeIndicatorKind
-                                           withReuseIdentifier:timeIndicatorIdentifier
-                                                  forIndexPath:indexPath];
+    [collectionView dequeueReusableSupplementaryViewOfKind:_timeIndicatorKind
+                                       withReuseIdentifier:_timeIndicatorIdentifier
+                                              forIndexPath:indexPath];
     return timeIndicatorCell;
   }
   return 0;

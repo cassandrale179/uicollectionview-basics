@@ -14,49 +14,45 @@
   EPGRenderer *epg2;
   
   // Identifier and view kind constants
-  NSString *timeCellIdentifier;
-  NSString *timeIndicatorIdentifier;
-  NSString *stationCellIdentifier;
-  NSString *timeIndicatorKind;
-  NSString *timeCellKind;
-  NSString *stationCellKind;
+  NSString *_timeCellIdentifier;
+  NSString *_timeIndicatorIdentifier;
+  NSString *_stationCellIdentifier;
+  NSString *_timeIndicatorKind;
+  NSString *_timeCellKind;
+  NSString *_stationCellKind;
 }
 @end
 
 // Implementation of Fake View Controller
 @implementation FakeViewController
 - (void)setUpFake {
-
+  
   // Intialize view kind here
-  timeIndicatorKind = @"TimeIndicatorView";
-  timeCellKind = @"HourHeaderView";
-  stationCellKind = @"ChannelHeaderView";
-
+  _timeIndicatorKind = @"TimeIndicatorView";
+  _timeCellKind = @"HourHeaderView";
+  _stationCellKind = @"ChannelHeaderView";
+  
   // Initialize class identifier
-  timeIndicatorIdentifier = NSStringFromClass([timeIndicatorKind class]);
-  timeCellIdentifier = NSStringFromClass([TimeCell class]);
-  stationCellIdentifier = NSStringFromClass([StationCell class]);
-
+  _timeIndicatorIdentifier = NSStringFromClass([_timeIndicatorKind class]);
+  _timeCellIdentifier = NSStringFromClass([TimeCell class]);
+  _stationCellIdentifier = NSStringFromClass([StationCell class]);
+  
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
   [viewLayout initWithDataSource:self];
   //TODO: Create a NEW epg object, but the time array needs to start 30 min after the first airing start time
   // Create an epg object
- // epg = [DataModel createEPG];
+  // epg = [DataModel createEPG];
   //_timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
   
   epg = [self createEPG];
   _timeArray = [DataModel calculateEPGTime:epg timeInterval:kAiringIntervalMinutes];
-//  NSLog(@"Should prepare layout");
-  
-//  NSLog(@"timearray: %@", _timeArray[0]);
   NSDateFormatter *df = [[NSDateFormatter alloc] init];
   [df setDateFormat:@"HH:mm:ss"];
-//  NSLog(@"The startTime: %@", [df stringFromDate:epg.stations[0].airings[0].airingStartTime]);
+  //  NSLog(@"The startTime: %@", [df stringFromDate:epg.stations[0].airings[0].airingStartTime]);
   NSDate *startTime = [viewLayout.dataSource layout:viewLayout startTimeForItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]];
-  //NSLog(@"The time from the datasource: %@", [df stringFromDate:startTime]);
-  //NSLog(@"The first time %@", [df stringFromDate:_timeArray[0]]);
-  //connect the collectionView with the layout
+  
+  // Connect the collectionView with the layout.
   collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame collectionViewLayout:viewLayout];
   [viewLayout prepareLayout];
   
