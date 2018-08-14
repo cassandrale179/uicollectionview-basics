@@ -42,7 +42,8 @@
   
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
-  [viewLayout initWithDataSource:self];
+  viewLayout.dataSource = self;
+  
   // Create an epg object
   _epg = [DataModel createEPG];
   _timeArray = [DataModel calculateEPGTime:_epg timeInterval:kAiringIntervalMinutes];
@@ -163,7 +164,7 @@ EndTimeForItemAtIndexPath:(NSIndexPath *)indexPath {
     TimeCell *timeCell = [collectionView dequeueReusableSupplementaryViewOfKind:_timeCellKind
                                                             withReuseIdentifier:_timeCellIdentifier
                                                                    forIndexPath:indexPath];
-    [timeCell setup:[_timeArray objectAtIndex:indexPath.item]];
+    [timeCell setup:_timeArray[indexPath.item]];
     return timeCell;
   } else if ([kind isEqualToString:_stationCellKind]) {
     StationCell *stationCell =
