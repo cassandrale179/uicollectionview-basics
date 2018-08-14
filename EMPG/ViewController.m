@@ -14,6 +14,7 @@
   EPGRenderer *_epg;
   
   // Identifier and view kind constants
+  NSString *_epgCellIdentifier;
   NSString *_timeCellIdentifier;
   NSString *_timeIndicatorIdentifier;
   NSString *_stationCellIdentifier;
@@ -27,15 +28,17 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
-  // Intialize view kind here
+  // Intialize view kind.
   _timeIndicatorKind = @"TimeIndicatorView";
   _timeCellKind = @"HourHeaderView";
   _stationCellKind = @"ChannelHeaderView";
+
   
-  // Initialize class identifier
+  // Initialize identifiers.
   _timeIndicatorIdentifier = NSStringFromClass([_timeIndicatorKind class]);
   _timeCellIdentifier = NSStringFromClass([TimeCell class]);
   _stationCellIdentifier = NSStringFromClass([StationCell class]);
+  _epgCellIdentifier = @"epgCell";
   
   // Create a view layout
   EPGCollectionViewLayout *viewLayout = [[EPGCollectionViewLayout alloc] init];
@@ -52,7 +55,7 @@
   
   // Register Class Method goes here
   [collectionView registerClass:[EPGCollectionViewCell class]
-     forCellWithReuseIdentifier:@"epgCell"];
+     forCellWithReuseIdentifier:_epgCellIdentifier];
   [collectionView registerClass:[TimeCell class]
      forSupplementaryViewOfKind:_timeCellKind
             withReuseIdentifier:_timeCellIdentifier];
@@ -88,7 +91,7 @@
 // For each cell in the index path, put information inside the cell
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-  EPGCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"epgCell"
+  EPGCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:_epgCellIdentifier
                                                                           forIndexPath:indexPath];
   // set the content of each cell
   if (indexPath.item != 0) {
@@ -162,9 +165,9 @@ EndTimeForItemAtIndexPath:(NSIndexPath *)indexPath {
                                                                    forIndexPath:indexPath];
     [timeCell setup:[_timeArray objectAtIndex:indexPath.item]];
     return timeCell;
-  } else if ([kind isEqualToString:@"ChannelHeaderView"]) {
+  } else if ([kind isEqualToString:_stationCellKind]) {
     StationCell *stationCell =
-    [collectionView dequeueReusableSupplementaryViewOfKind:@"ChannelHeaderView"
+    [collectionView dequeueReusableSupplementaryViewOfKind:_stationCellKind
                                        withReuseIdentifier:_stationCellIdentifier
                                               forIndexPath:indexPath];
     [stationCell setup:_epg.stations[indexPath.section].stationName];
