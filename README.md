@@ -4,8 +4,6 @@ This is a log for future documentation purpose.
 
 
 ## Table of Contents 
-
-### 1. Create An UICollectionView
 #### A. Create the cell for the collectionview
 **1. Create the actual custom Cell class**:
 - Airing cells display different showings playing at different times. <br> 
